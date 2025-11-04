@@ -13,6 +13,41 @@ body {
 	-webkit-user-select: none; /* 禁用文字選擇 */
 	-webkit-tap-highlight-color: transparent; /* 移除點擊高亮效果 */  
 }
+
+#language-switch {
+	position: fixed;
+	top: 12px;
+	right: 16px;
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	align-items: center;
+	z-index: 1000;
+	font-size: 14px;
+}
+
+#language-switch a {
+	padding: 4px 10px;
+	border-radius: 14px;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	background-color: rgba(255, 255, 255, 0.85);
+	color: #333;
+	text-decoration: none;
+	transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+#language-switch a.active {
+	font-weight: 600;
+	background-color: #ffe8b3;
+	border-color: #f0a500;
+	color: #222;
+}
+
+#language-switch a:hover {
+	background-color: #fff0cc;
+}
+
 button { display: inline-block; margin: 2px 0; padding: 4px 6px; font-size: 20px }
 select { margin: 2px 0; padding: 4px 6px; font-size: 16px }
 span.butt { display: inline-block; margin: 2px 1px; padding: 4px 6px; font-size: 18px; border: 1px solid #666; border-radius: 10px; cursor: pointer; background-color: #eee; color: #333; box-shadow: 0 2px 4px rgba(0,0,0,0.1) }
