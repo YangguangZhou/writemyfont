@@ -116,20 +116,20 @@ class PressureDrawing {
 
         const defaultOptions = {
             size: 12,
-            thinning: 0.8,          // 增加壓力對粗細的影響
-            smoothing: 0.5,
-            streamline: 0.3,        // 減少流線化，讓壓力變化更明顯
-            simulatePressure: shouldSimulatePressure, // 動態決定是否模擬壓力
-            easing: (t) => t,
+            thinning: 0.6,          // 降低thinning值，讓筆觸更均勻自然
+            smoothing: 0.6,         // 提高平滑度，減少抖動
+            streamline: 0.4,        // 適度的流線化，保持自然感
+            simulatePressure: shouldSimulatePressure,
+            easing: (t) => Math.sin(t * Math.PI / 2), // 使用緩動函數讓壓力變化更平滑
             start: {
-                taper: 0,
-                easing: (t) => t,
+                taper: 5,           // 起筆有輕微漸變
+                easing: (t) => t * t, // 二次緩動
                 cap: true
             },
             end: {
-                taper: 25,          // 大幅增加結尾的漸減效果
-                easing: (t) => Math.sin((t * Math.PI) / 2), // 使用正弦緩動，更平滑
-                cap: true           // 使用圓頭來避免尖銳結尾
+                taper: 30,          // 收筆漸變更自然
+                easing: (t) => Math.sin((t * Math.PI) / 2),
+                cap: true
             }
         };
 
@@ -448,20 +448,20 @@ class PressureDrawing {
 
         const defaultOptions = {
             size: 12,
-            thinning: 0.8,          // 增加壓力對粗細的影響
-            smoothing: 0.5,
-            streamline: 0.3,        // 減少流線化，讓壓力變化更明顯
-            simulatePressure: shouldSimulatePressure, // 動態決定是否模擬壓力
-            easing: (t) => t,
+            thinning: 0.6,          // 降低thinning值，讓筆觸更均勻自然
+            smoothing: 0.6,         // 提高平滑度，減少抖動
+            streamline: 0.4,        // 適度的流線化，保持自然感
+            simulatePressure: shouldSimulatePressure,
+            easing: (t) => Math.sin(t * Math.PI / 2), // 使用緩動函數讓壓力變化更平滑
             start: {
-                taper: 0,
-                easing: (t) => t,
+                taper: 5,           // 起筆有輕微漸變
+                easing: (t) => t * t, // 二次緩動
                 cap: true
             },
             end: {
-                taper: 25,          // 大幅增加結尾的漸減效果
-                easing: (t) => Math.sin((t * Math.PI) / 2), // 使用正弦緩動，更平滑
-                cap: true           // 使用圓頭來避免尖銳結尾
+                taper: 30,          // 收筆漸變更自然
+                easing: (t) => Math.sin((t * Math.PI) / 2),
+                cap: true
             }
         };
 
@@ -482,90 +482,84 @@ class PressureDrawing {
 
     // Simulate pressure from pointer events
     simulatePressure(event, eventType = 'move') {
-
         
         // 提筆事件特殊處理 - 使用較低的壓力值
         if (eventType === 'end' && this.lastPoint) {
             return Math.max(0.05, this.lastPoint.pressure * 0.3); // 提筆時壓力大幅減少
         }
         
-        // Try to get pressure from pointer event (works with Apple Pencil)
-        if (event && event.pressure !== undefined && event.pressure > 0.1 && event.pointerType === 'pen') {
-            // 只有筆類型的 pointer event 且壓力值 > 0.1 才算真實筆壓支援
-            this.hasPressureSupport = true;
-            
-            // 提筆事件時限制最大壓力值
-            let pressure = event.pressure;
-            if (eventType === 'end') {
-                pressure = Math.min(pressure, 0.6); // 提筆時限制最大壓力
-            }
-            
-            return Math.max(0.1, Math.min(1.0, pressure));
-        }
-        
-        // 非筆類型的 pointer events（如手指）使用模擬壓力
-        if (event && event.pointerType && event.pointerType !== 'pen') {
-            this.pressureCheckCount++;
-            return 0.5; // 返回預設值，讓速度模擬邏輯處理
-        }
-        
-        // Try to get pressure from touch event
-        if (event && event.touches && event.touches.length > 0) {
-            const touch = event.touches[0];
-            
-            // Apple Pencil support through force property
-            if (touch.force !== undefined && touch.force > 0.1 && touch.touchType === 'stylus') {
-                // 只有觸控筆類型且 force > 0.1 才算真實筆壓支援
+        // 優先檢測 Apple Pencil 通過 pointer event
+        if (event && event.pressure !== undefined && event.pointerType === 'pen') {
+            // Apple Pencil 在 Safari 中會提供 pointerType === 'pen' 和 pressure 值
+            if (event.pressure > 0 && event.pressure < 1) {
                 this.hasPressureSupport = true;
                 
                 // 提筆事件時限制最大壓力值
-                let force = touch.force;
+                let pressure = event.pressure;
                 if (eventType === 'end') {
-                    force = Math.min(force, 0.6); // 提筆時限制最大壓力
+                    pressure = Math.min(pressure, 0.6);
                 }
                 
-                return Math.max(0.1, Math.min(1.0, force));
-            }
-            
-            // 其他觸控事件（手指觸控或沒有 touchType）不提供真實壓力，使用模擬壓力
-            if (!touch.touchType || touch.touchType !== 'stylus') {
-                this.pressureCheckCount++;
-                return 0.5; // 返回預設值，讓速度模擬邏輯處理
+                // Apple Pencil 壓力值通常在 0-1 範圍，直接使用但確保在合理範圍
+                return Math.max(0.05, Math.min(1.0, pressure));
             }
         }
         
-        // Try to get pressure from mouse/pointer events
-        if (event && event.buttons !== undefined && event.type && event.type.includes('mouse')) {
-            // For mouse events, don't claim pressure support and use default simulation
-            // 滑鼠事件不提供真實壓力，應該使用模擬壓力
-            this.pressureCheckCount++;
-            return 0.5; // 返回預設值，讓 addPoint 中的速度模擬邏輯處理
-        }
-        
-        // Check for webkitForce (Safari specific for Force Touch)
-        if (event && event.webkitForce !== undefined && event.webkitForce > 1.0) {
-            // 只有 webkitForce > 1.0 才算真實壓力支援（正常值為 1.0，有壓力時會超過）
-            this.hasPressureSupport = true;
+        // 檢測 Apple Pencil 通過 touch event (iOS Safari)
+        if (event && event.touches && event.touches.length > 0) {
+            const touch = event.touches[0];
             
-            // 提筆事件時限制最大壓力值
-            let force = event.webkitForce;
-            if (eventType === 'end') {
-                force = Math.min(force, 2.0); // 提筆時限制最大壓力
+            // iOS 的 Apple Pencil 支持 - 使用 force 和 touchType
+            if (touch.touchType === 'stylus' || (touch.force !== undefined && touch.force > 0 && touch.force !== 1)) {
+                // touchType === 'stylus' 表示 Apple Pencil
+                // 或者 force 值有變化（不是固定的 0 或 1）
+                if (touch.force !== undefined) {
+                    this.hasPressureSupport = true;
+                    
+                    let force = touch.force;
+                    if (eventType === 'end') {
+                        force = Math.min(force, 0.6);
+                    }
+                    
+                    // iOS force 值通常在 0-1 範圍，需要調整映射
+                    // 讓手寫更自然：輕觸約 0.2-0.3，正常 0.4-0.7，用力 0.8-1.0
+                    return Math.max(0.1, Math.min(1.0, force * 0.9 + 0.1));
+                }
             }
-            
-            // webkitForce 的範圍通常是 1.0-3.0，需要映射到 0.1-1.0
-            const normalizedForce = Math.max(0.1, Math.min(1.0, (force - 1.0) / 2.0 + 0.5));
-            return normalizedForce;
         }
         
-        // 增加檢測計數
+        // 檢測 Safari 的 webkitForce (MacBook 觸控板)
+        if (event && event.webkitForce !== undefined && event.webkitForce > 0) {
+            // webkitForce 正常值為 1.0，用力按壓可達 2.0-3.0
+            if (event.webkitForce !== 1.0) {
+                this.hasPressureSupport = true;
+                
+                let force = event.webkitForce;
+                if (eventType === 'end') {
+                    force = Math.min(force, 2.0);
+                }
+                
+                // webkitForce 範圍通常是 0.5-3.0，映射到 0.1-1.0
+                // 1.0 是自然按壓，小於 1.0 是輕觸，大於 1.0 是用力
+                let normalizedForce;
+                if (force <= 1.0) {
+                    // 0.5-1.0 映射到 0.2-0.5
+                    normalizedForce = 0.2 + (force - 0.5) * 0.6;
+                } else {
+                    // 1.0-3.0 映射到 0.5-1.0
+                    normalizedForce = 0.5 + Math.min(force - 1.0, 2.0) * 0.25;
+                }
+                return Math.max(0.1, Math.min(1.0, normalizedForce));
+            }
+        }
+        
+        // 非真實壓力設備使用模擬
         this.pressureCheckCount++;
         
-        // Default pressure simulation with slight randomization
         if (eventType === 'end') {
-            return 0.3; // 提筆時使用固定的低壓力值
+            return 0.3;
         }
-        return 0.5 + Math.random() * 0.3; // Random pressure between 0.5 and 0.8
+        return 0.5;
     }
 }
 

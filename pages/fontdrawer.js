@@ -148,6 +148,7 @@ async function loadSettings() {
 		pressureEffect: await loadFromDB('pressureEffect', 'none'),			// 筆壓公式，預設為 none
 		gridType: await loadFromDB('gridType', '3x3grid'),					// 格線類型，預設為 3x3grid
 		oldPressureMode: await loadFromDB('oldPressureMode', 'N') == 'Y',	// 啟用舊版筆壓模式，預設為 N
+		showBaseline: await loadFromDB('showBaseline', 'Y') == 'Y',			// 是否顯示基線，預設為 Y
 		fontNameEng: await loadFromDB('fontNameEng') || 'MyFreehandFont',
 		fontNameCJK: await loadFromDB('fontNameCJK') || fdrawer.fontNameCJK,
 		noFixedWidthFlag: await loadFromDB('noFixedWidthFlag', 'N') == 'Y',	// 比例寬輸出，預設為 N
@@ -269,11 +270,13 @@ async function initCanvas(canvas) {
 	}
 
 	// 繪製基線
-	gridCtx.strokeStyle = '#ee9999';	// 基線顏色
-	gridCtx.beginPath();
-	gridCtx.moveTo(0, gridYOff + emHeight*0.75);
-	gridCtx.lineTo(gridCanvas.width, gridYOff + emHeight*0.75);
-	gridCtx.stroke();
+	if (settings.showBaseline) {
+		gridCtx.strokeStyle = '#ee9999';	// 基線顏色
+		gridCtx.beginPath();
+		gridCtx.moveTo(0, gridYOff + emHeight*0.75);
+		gridCtx.lineTo(gridCanvas.width, gridYOff + emHeight*0.75);
+		gridCtx.stroke();
+	}
 
 	// 依照設定值顯示筆寬、筆刷、筆壓UI
 	$('#lineWidthSlider').val(settings.lineWidth);
@@ -1077,6 +1080,7 @@ $(document).ready(async function () {
 
 		$('#pressureEffectSelect').val(settings.pressureEffect);
 		$('#pressureDrawingEnabled').prop('checked', settings.oldPressureMode);
+		$('#showBaselineCheck').prop('checked', settings.showBaseline);
 		$('#gridTypeSelect').val(settings.gridType);
 
 		if (!settings.notNewFlag) updateSetting('notNewFlag', true); // 如果是第一次使用，則設定 notNewFlag 為 true
@@ -1103,6 +1107,12 @@ $(document).ready(async function () {
 	$('#pressureEffectSelect').change(function () { updateSetting('pressureEffect', $(this).val()); });
 	$('#gridTypeSelect').change(function () { 
 		updateSetting('gridType', $(this).val());
+		initCanvas(canvas);
+	});
+	
+	// 顯示基線設定事件監聽器
+	$('#showBaselineCheck').on('change', async function () {
+		await updateSetting('showBaseline', $(this).prop('checked'));
 		initCanvas(canvas);
 	});
 

@@ -5,13 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>手寫字型產生器 by 字嗨</title>
 	<link rel="stylesheet" href="style.css">
+	<script src="i18n.js"></script>
 </head>
 <body lang="zh-TW">
-	<nav id="language-switch">
-		<a href="index.html" class="active">繁體中文</a>
-		<a href="zh-cn.html">簡體中文</a>
-		<a href="ja.html">日本語</a>
-	</nav>
 	<div id="list-container">
 		<label for="listSelect">字表：</label>
 		<select id="listSelect"></select>
@@ -50,9 +46,23 @@
 	<div id="navi-container">
 		<span class="butt" id="hintButton">💡</span>
 		<span class="butt" id="settingButton">⚙️</span>
+		<span class="butt" id="langButton">🌐</span>
 		<span id="spanDoneCount">-</span>
 		<span class="butt" id="downloadButton">💾</span>
     </div>
+	
+	<!-- 语言切换弹窗 -->
+	<div id="lang-container" class="dialog">
+		<div class="dialog-body">
+			<span id="closeLangButton" class="close">×</span>
+			<h2 id="lang-title">语言 / Language</h2>
+			<div id="lang-options">
+				<button class="lang-option" data-lang="zh-CN">简体中文</button>
+				<button class="lang-option" data-lang="zh-TW">繁體中文</button>
+				<button class="lang-option" data-lang="ja">日本語</button>
+			</div>
+		</div>
+	</div>
 	<div id="progress-container">
 		<progress id="progress-bar" value="0" max="100"></progress>
 		<span id="progress-text">0%</span>
@@ -117,6 +127,10 @@
 				<option value="boxgrid">回字格</option>
 				<option value="nogrid">無格線（僅字身框）</option>
 			</select>
+
+			<h3>顯示基線參考線</h3>
+			<input id="showBaselineCheck" type="checkbox" checked />
+			<span class="note">基線參考線位於字框下方 3/4 處，主要用於對齊半形字符。</span>
 
 			<h3>中文字不等寬</h3>
 			<input id="noFixedWidthFlag" type="checkbox" />
@@ -191,28 +205,36 @@
 	<script src="https://opentype.js.org/dist/opentype.js"></script>
     <script src="potrace.js"></script>
 	<script>
+		// 根据当前语言动态设置 fdrawer 配置
+		const currentLang = window.i18n.getCurrentLanguage();
 		const fdrawer = {
-			dbName: 'FontDrawerDB',
-			fontNameCJK: '我的手寫字型',
-			fontLang: 'zh-TW',
-			codePage: 0x00100001,
-			findMsg: '請輸入要找的文字：',
-			notFound: '查無此字符！',
-			confirmAdd: '請問要新增到使用者字表嗎？',
-			noDataToExport: '沒有可匯出的資料。',
-			importConfirm: '確定要匯入資料嗎？這將清除目前編輯中的所有資料。',
-			importDone: '匯入完成。',
-			clearConfirm: '確定要清除所有寫過的字嗎？',
-			clearDone: '已清除。',
-			welcomeTitle: '歡迎使用手寫字型產生器！',
-			settingsTitle: '字型設定',
-			inAppNotice: '請使用裝置瀏覽器開啟以獲得最佳使用體驗。',
-			customList: '使用者字表'
+			dbName: currentLang === 'ja' ? 'FontDrawerDBja' : 'FontDrawerDB',
+			fontNameCJK: currentLang === 'zh-CN' ? '我的手写字体' : (currentLang === 'ja' ? '私の手書きフォント' : '我的手寫字型'),
+			fontLang: currentLang === 'ja' ? 'ja' : (currentLang === 'zh-CN' ? 'zh-CN' : 'zh-TW'),
+			codePage: currentLang === 'ja' ? 0x00020001 : 0x00100001,
+			findMsg: window.i18n.t('findMsg'),
+			notFound: window.i18n.t('notFound'),
+			confirmAdd: window.i18n.t('confirmAdd'),
+			noDataToExport: window.i18n.t('noDataToExport'),
+			importConfirm: window.i18n.t('importConfirm'),
+			importDone: window.i18n.t('importDone'),
+			clearConfirm: window.i18n.t('clearConfirm'),
+			clearDone: window.i18n.t('clearDone'),
+			welcomeTitle: window.i18n.t('welcomeTitle'),
+			settingsTitle: window.i18n.t('settingsTitle'),
+			inAppNotice: window.i18n.t('inAppNotice'),
+			customList: window.i18n.t('customList')
 		};
+		
+		// 更新页面标题和语言属性
+		document.title = window.i18n.t('title');
+		document.documentElement.lang = currentLang;
+		document.body.lang = currentLang;
 	</script>
 
     <script src="pressure-drawing.js"></script>
     <script src="cglyphlist.js"></script>
     <script src="fontdrawer.js"></script>
+	<script src="i18n-ui.js"></script>
 </body>
 </html>
