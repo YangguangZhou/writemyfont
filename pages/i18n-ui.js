@@ -77,6 +77,22 @@
 		$('#clearAllButton').text(t('clearAllButton'));
 		$settingsH3.eq(10).text(t('exportEventsLabel'));
 		$('#exportEventsButton').text(t('exportEventsButton'));
+
+		// 更新匯入字表與預覽區塊
+		$('#importFromTextTitle').text(t('importFromText'));
+		$('#importTextarea').attr('placeholder', t('importTextPlaceholder'));
+		$('#importTextButton').text(t('importTextButton'));
+		$('#importTextNote').text(t('importTextNote'));
+		$('#previewFontTitle').text(t('previewFont'));
+		$('#openPreviewButton').text(t('openPreviewButton'));
+		$('#preview-title').text(t('previewFont'));
+		$('#previewTextLabel').text(t('previewTextLabel') + '：');
+		$('#previewTextInput').attr('placeholder', t('previewTextPlaceholder'));
+		$('#previewNote').text(t('previewNote'));
+		$('#previewFontSizeLabel').text(t('previewFontSize') + '：');
+		$('#previewLineHeightLabel').text(t('previewLineHeight') + '：');
+		$('#previewButton').text(t('previewButton'));
+		$('#previewClearButton').text(t('previewClear'));
 		
 		// 更新下载页面
 		const $downloadH3 = $('#download-container h3');

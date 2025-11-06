@@ -154,6 +154,17 @@
 			<br />
 			<br />
 			<hr />
+			<h3 id="importFromTextTitle">從文字匯入字表</h3>
+			<textarea id="importTextarea" placeholder="在此貼上或輸入要匯入的文字..." rows="5" style="width: 100%; padding: 8px; font-size: 16px;"></textarea>
+			<button id="importTextButton">匯入到使用者字表</button>
+			<span class="note" id="importTextNote">系統會自動去除重複字符，並將字符添加到使用者字表中。</span>
+			<br />
+			<br />
+			<h3 id="previewFontTitle">預覽字型</h3>
+			<button id="openPreviewButton">開啟字型預覽</button>
+			<br />
+			<br />
+			<hr />
 			<h3>完全清除字型資料</h3>
 			<button id="clearAllButton">清除字型資料（無法復原！）</button>
 			<br />
@@ -200,6 +211,41 @@
 			<p class="dummy"></p>
 		</div>
 	</div> -->
+	
+	<!-- 预览字体对话框 -->
+	<div id="preview-container" class="dialog">
+		<div class="dialog-body">
+			<span id="closePreviewButton" class="close">×</span>
+			<h2 id="preview-title">預覽字型</h2>
+			
+			<div style="margin-bottom: 20px;">
+				<label for="previewTextInput" id="previewTextLabel">輸入預覽文字：</label><br>
+				<textarea id="previewTextInput" placeholder="輸入要預覽的文字..." rows="3" style="width: 100%; padding: 8px; font-size: 16px; margin-top: 5px;"></textarea>
+				<span class="note" id="previewNote">僅顯示已書寫的字符</span>
+			</div>
+			
+			<div style="margin-bottom: 15px;">
+				<label for="previewFontSizeSlider" id="previewFontSizeLabel">字號：</label>
+				<input id="previewFontSizeSlider" type="range" min="16" max="120" value="48" style="width: 200px;" />
+				<span id="previewFontSizeValue">48px</span>
+			</div>
+			
+			<div style="margin-bottom: 15px;">
+				<label for="previewLineHeightSlider" id="previewLineHeightLabel">行高：</label>
+				<input id="previewLineHeightSlider" type="range" min="100" max="200" value="150" style="width: 200px;" />
+				<span id="previewLineHeightValue">150%</span>
+			</div>
+			
+			<button id="previewButton">預覽</button>
+			<button id="previewClearButton">清空</button>
+			
+			<hr style="margin: 20px 0;">
+			
+			<div id="previewOutput" style="padding: 20px; border: 1px solid #ccc; min-height: 200px; line-height: 1.5; font-size: 48px; overflow-wrap: break-word; background-color: #fff;"></div>
+			
+			<p class="dummy"></p>
+		</div>
+	</div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="https://opentype.js.org/dist/opentype.js"></script>
@@ -208,10 +254,10 @@
 		// 根据当前语言动态设置 fdrawer 配置
 		const currentLang = window.i18n.getCurrentLanguage();
 		const fdrawer = {
-			dbName: currentLang === 'ja' ? 'FontDrawerDBja' : 'FontDrawerDB',
+			dbName: currentLang === 'zh-CN' ? 'FontDrawerDB_zhCN' : (currentLang === 'ja' ? 'FontDrawerDBja' : 'FontDrawerDB'),
 			fontNameCJK: currentLang === 'zh-CN' ? '我的手写字体' : (currentLang === 'ja' ? '私の手書きフォント' : '我的手寫字型'),
 			fontLang: currentLang === 'ja' ? 'ja' : (currentLang === 'zh-CN' ? 'zh-CN' : 'zh-TW'),
-			codePage: currentLang === 'ja' ? 0x00020001 : 0x00100001,
+			codePage: currentLang === 'zh-CN' ? 0x00100001 : (currentLang === 'ja' ? 0x00020001 : 0x00100001),
 			findMsg: window.i18n.t('findMsg'),
 			notFound: window.i18n.t('notFound'),
 			confirmAdd: window.i18n.t('confirmAdd'),
@@ -233,8 +279,37 @@
 	</script>
 
     <script src="pressure-drawing.js"></script>
-    <script src="cglyphlist.js"></script>
-    <script src="fontdrawer.js"></script>
-	<script src="i18n-ui.js"></script>
+    <script>
+		// 根据语言动态加载对应的字符列表文件
+		(function() {
+			const lang = window.i18n.getCurrentLanguage();
+			let glyphListFile;
+			
+			if (lang === 'zh-CN') {
+				glyphListFile = 'sglyphlist.js';  // 简体中文
+			} else if (lang === 'ja') {
+				glyphListFile = 'jglyphlist.js';  // 日文
+			} else {
+				glyphListFile = 'cglyphlist.js';  // 繁体中文（默认）
+			}
+			
+			// 动态加载对应的字符列表文件
+			const script = document.createElement('script');
+			script.src = glyphListFile;
+			script.onload = function() {
+				// 字符列表加载完成后，再加载 fontdrawer.js
+				const fontDrawerScript = document.createElement('script');
+				fontDrawerScript.src = 'fontdrawer.js';
+				fontDrawerScript.onload = function() {
+					// fontdrawer.js 加载完成后，加载 i18n-ui.js
+					const i18nUIScript = document.createElement('script');
+					i18nUIScript.src = 'i18n-ui.js';
+					document.body.appendChild(i18nUIScript);
+				};
+				document.body.appendChild(fontDrawerScript);
+			};
+			document.body.appendChild(script);
+		})();
+	</script>
 </body>
 </html>

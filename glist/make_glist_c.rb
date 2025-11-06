@@ -129,7 +129,23 @@ end
 verybaselist = ('a'..'z').to_a + ('A'..'Z').to_a
 verybaselist += ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'comma', 'period', 'hyphen']
 
-baselist = verybaselist + ['uni02CA', 'caron', 'uni02CB', 'dotaccent']
+# 添加常用标点符号
+common_punctuation = [
+	'exclam', 'quotedbl', 'numbersign', 'dollar', 'percent', 'ampersand', 'quotesingle',
+	'parenleft', 'parenright', 'asterisk', 'plus', 'comma', 'hyphen', 'period', 'slash',
+	'colon', 'semicolon', 'less', 'equal', 'greater', 'question', 'at',
+	'bracketleft', 'backslash', 'bracketright', 'asciicircum', 'underscore', 'grave',
+	'braceleft', 'bar', 'braceright', 'asciitilde',
+	# 全角标点
+	'uni3001', 'uni3002', 'uni300A', 'uni300B', 'uni300C', 'uni300D', 'uni300E', 'uni300F',
+	'uni3010', 'uni3011', 'uni3014', 'uni3015', 'uni3016', 'uni3017',
+	'uniFF01', 'uniFF08', 'uniFF09', 'uniFF0C', 'uniFF0E', 'uniFF1A', 'uniFF1B', 
+	'uniFF1F', 'uniFF5B', 'uniFF5C', 'uniFF5D',
+	# 其他常用符号
+	'uni2013', 'uni2014', 'uni2018', 'uni2019', 'uni201C', 'uni201D', 'uni2026'
+]
+
+baselist = verybaselist + ['uni02CA', 'caron', 'uni02CB', 'dotaccent'] + common_punctuation
 ('ㄅ'..'ㄩ').to_a.each { |c| baselist << sprintf('uni%04X', c.ord) }
 '一二三四五六七八九十微風迎客軟語伴茶，。'.split(//).each { |c| baselist << sprintf('uni%04X', c.ord) }
 

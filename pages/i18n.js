@@ -5,6 +5,7 @@ const i18n = {
 		title: '手写字体生成器 by 字嗨',
 		listLabel: '字表：',
 		charSeqLabel: '字符列表',
+		charUnit: '字',
 		welcomeTitle: '欢迎使用手写字体生成器！',
 		settingsTitle: '字体设置',
 		downloadTitle: '下载',
@@ -99,7 +100,62 @@ const i18n = {
 		clearConfirm: '确定要清除所有写过的字吗？',
 		clearDone: '已清除。',
 		inAppNotice: '请使用设备浏览器开启以获得最佳使用体验。',
-		customList: '用户字表'
+		customList: '用户字表',
+		
+		// 导入字表功能
+		importFromText: '从文本导入字表',
+		importTextLabel: '输入文本',
+		importTextPlaceholder: '在此粘贴或输入要导入的文字...',
+		importTextButton: '导入到用户字表',
+		importTextNote: '系统会自动去除重复字符，并将字符添加到用户字表。',
+		importTextSuccess: '成功导入 {0} 个字符到用户字表',
+		importTextDuplicate: '已去重 {0} 个字符',
+		
+		// 预览功能
+		previewFont: '预览字体',
+		openPreviewButton: '打开字体预览',
+		previewTextLabel: '输入预览文字',
+		previewTextPlaceholder: '输入要预览的文字...',
+		previewButton: '预览',
+		previewNote: '仅显示已书写的字符',
+		previewFontSize: '字号',
+		previewLineHeight: '行高',
+		previewClear: '清空',
+		
+		// 字表名称
+		glyphListNames: {
+			'基礎字': '基础字',
+			'簡體常用字': '简体常用字',
+			'繁體字': '繁体字',
+			'基本包-漢字#1': '基本包-汉字#1',
+			'基本包-漢字#2': '基本包-汉字#2',
+			'基本包-漢字#3': '基本包-汉字#3',
+			'基本包-漢字#4': '基本包-汉字#4',
+			'基本包-漢字#5': '基本包-汉字#5',
+			'基本包-漢字#6': '基本包-汉字#6',
+			'基本包-漢字#7': '基本包-汉字#7',
+			'基本包-漢字#8': '基本包-汉字#8',
+			'基本包-漢字#9': '基本包-汉字#9',
+			'基本包-漢字#10': '基本包-汉字#10',
+			'基本包-漢字#11': '基本包-汉字#11',
+			'基本包-漢字#12': '基本包-汉字#12',
+			'基本包-漢字#13': '基本包-汉字#13',
+			'基本包-漢字#14': '基本包-汉字#14',
+			'基本包-漢字#15': '基本包-汉字#15',
+			'基本包-符號': '基本包-符号',
+			'本土包-漢字#1': '本土包-汉字#1',
+			'本土包-漢字#2': '本土包-汉字#2',
+			'本土包-符號': '本土包-符号',
+			'日文包-漢字#1': '日文包-汉字#1',
+			'日文包-漢字#2': '日文包-汉字#2',
+			'日文包-符號': '日文包-符号',
+			'粵語包-漢字': '粤语包-汉字',
+			'命名包-漢字#1': '命名包-汉字#1',
+			'命名包-漢字#2': '命名包-汉字#2',
+			'補充符號包': '补充符号包',
+			'附表：台文全羅': '附录：台文全罗',
+			'附表：心經': '附录：心经'
+		}
 	},
 	
 	// 繁体中文
@@ -107,6 +163,7 @@ const i18n = {
 		title: '手寫字型產生器 by 字嗨',
 		listLabel: '字表：',
 		charSeqLabel: '字符列表',
+		charUnit: '字',
 		welcomeTitle: '歡迎使用手寫字型產生器！',
 		settingsTitle: '字型設定',
 		downloadTitle: '下載',
@@ -196,7 +253,62 @@ const i18n = {
 		clearConfirm: '確定要清除所有寫過的字嗎？',
 		clearDone: '已清除。',
 		inAppNotice: '請使用裝置瀏覽器開啟以獲得最佳使用體驗。',
-		customList: '使用者字表'
+		customList: '使用者字表',
+		
+		// 导入字表功能
+		importFromText: '從文字匯入字表',
+		importTextLabel: '輸入文字',
+		importTextPlaceholder: '在此貼上或輸入要匯入的文字...',
+		importTextButton: '匯入到使用者字表',
+		importTextNote: '系統會自動去除重複字符，並將字符添加到使用者字表中。',
+		importTextSuccess: '成功匯入 {0} 個字符到使用者字表',
+		importTextDuplicate: '已去重 {0} 個字符',
+		
+		// 预览功能
+		previewFont: '預覽字型',
+		openPreviewButton: '開啟字型預覽',
+		previewTextLabel: '輸入預覽文字',
+		previewTextPlaceholder: '輸入要預覽的文字...',
+		previewButton: '預覽',
+		previewNote: '僅顯示已書寫的字符',
+		previewFontSize: '字號',
+		previewLineHeight: '行高',
+		previewClear: '清空',
+		
+		// 字表名稱
+		glyphListNames: {
+			'基礎字': '基礎字',
+			'簡體常用字': '簡體常用字',
+			'繁體字': '繁體字',
+			'基本包-漢字#1': '基本包-漢字#1',
+			'基本包-漢字#2': '基本包-漢字#2',
+			'基本包-漢字#3': '基本包-漢字#3',
+			'基本包-漢字#4': '基本包-漢字#4',
+			'基本包-漢字#5': '基本包-漢字#5',
+			'基本包-漢字#6': '基本包-漢字#6',
+			'基本包-漢字#7': '基本包-漢字#7',
+			'基本包-漢字#8': '基本包-漢字#8',
+			'基本包-漢字#9': '基本包-漢字#9',
+			'基本包-漢字#10': '基本包-漢字#10',
+			'基本包-漢字#11': '基本包-漢字#11',
+			'基本包-漢字#12': '基本包-漢字#12',
+			'基本包-漢字#13': '基本包-漢字#13',
+			'基本包-漢字#14': '基本包-漢字#14',
+			'基本包-漢字#15': '基本包-漢字#15',
+			'基本包-符號': '基本包-符號',
+			'本土包-漢字#1': '本土包-漢字#1',
+			'本土包-漢字#2': '本土包-漢字#2',
+			'本土包-符號': '本土包-符號',
+			'日文包-漢字#1': '日文包-漢字#1',
+			'日文包-漢字#2': '日文包-漢字#2',
+			'日文包-符號': '日文包-符號',
+			'粵語包-漢字': '粵語包-漢字',
+			'命名包-漢字#1': '命名包-漢字#1',
+			'命名包-漢字#2': '命名包-漢字#2',
+			'補充符號包': '補充符號包',
+			'附表：台文全羅': '附表：台文全羅',
+			'附表：心經': '附表：心經'
+		}
 	},
 	
 	// 日语
@@ -204,6 +316,7 @@ const i18n = {
 		title: 'フォントを書こう！ by 字嗨',
 		listLabel: '範囲：',
 		charSeqLabel: 'グリフ一覧',
+		charUnit: '字',
 		welcomeTitle: 'ようこそ',
 		settingsTitle: 'フォント設定',
 		downloadTitle: 'ダウンロード',
@@ -294,7 +407,62 @@ const i18n = {
 		clearConfirm: '編集中のデータを破棄しますか？',
 		clearDone: '削除しました',
 		inAppNotice: 'アプリの組み込みブラウザを利用しているようです。\nシステムブラウザで開くことがおすすめです。',
-		customList: 'ユーザー文字リスト'
+		customList: 'ユーザー文字リスト',
+		
+		// 导入字表功能
+		importFromText: 'テキストから文字をインポート',
+		importTextLabel: 'テキスト入力',
+		importTextPlaceholder: 'インポートしたいテキストを貼り付けまたは入力...',
+		importTextButton: 'ユーザー文字リストにインポート',
+		importTextNote: '重複した文字は自動的に除外され、ユーザー文字リストに追加されます。',
+		importTextSuccess: '{0} 文字をユーザー文字リストにインポートしました',
+		importTextDuplicate: '{0} 文字を重複削除しました',
+		
+		// 预览功能
+		previewFont: 'フォントプレビュー',
+		openPreviewButton: 'プレビューを開く',
+		previewTextLabel: 'プレビューテキスト',
+		previewTextPlaceholder: 'プレビューしたいテキストを入力...',
+		previewButton: 'プレビュー',
+		previewNote: '書かれた文字のみ表示されます',
+		previewFontSize: 'フォントサイズ',
+		previewLineHeight: '行の高さ',
+		previewClear: 'クリア',
+		
+		// 字表名称
+		glyphListNames: {
+			'基礎字': '基本セット',
+			'簡體常用字': '簡体常用字セット',
+			'繁體字': '繁体字セット',
+			'基本包-漢字#1': '基本漢字パック #1',
+			'基本包-漢字#2': '基本漢字パック #2',
+			'基本包-漢字#3': '基本漢字パック #3',
+			'基本包-漢字#4': '基本漢字パック #4',
+			'基本包-漢字#5': '基本漢字パック #5',
+			'基本包-漢字#6': '基本漢字パック #6',
+			'基本包-漢字#7': '基本漢字パック #7',
+			'基本包-漢字#8': '基本漢字パック #8',
+			'基本包-漢字#9': '基本漢字パック #9',
+			'基本包-漢字#10': '基本漢字パック #10',
+			'基本包-漢字#11': '基本漢字パック #11',
+			'基本包-漢字#12': '基本漢字パック #12',
+			'基本包-漢字#13': '基本漢字パック #13',
+			'基本包-漢字#14': '基本漢字パック #14',
+			'基本包-漢字#15': '基本漢字パック #15',
+			'基本包-符號': '基本記号パック',
+			'本土包-漢字#1': 'ローカル漢字パック #1',
+			'本土包-漢字#2': 'ローカル漢字パック #2',
+			'本土包-符號': 'ローカル記号パック',
+			'日文包-漢字#1': '日本語漢字パック #1',
+			'日文包-漢字#2': '日本語漢字パック #2',
+			'日文包-符號': '日本語記号パック',
+			'粵語包-漢字': '広東語漢字パック',
+			'命名包-漢字#1': '人名漢字パック #1',
+			'命名包-漢字#2': '人名漢字パック #2',
+			'補充符號包': '追加記号パック',
+			'附表：台文全羅': '付録：台湾語全羅',
+			'附表：心經': '付録：般若心経'
+		}
 	}
 };
 
@@ -335,11 +503,22 @@ function t(key) {
 	return texts[key] || key;
 }
 
+// 获取字表名称
+function getGlyphListName(listKey) {
+	const lang = getCurrentLanguage();
+	const texts = i18n[lang];
+	if (texts && texts.glyphListNames && texts.glyphListNames[listKey]) {
+		return texts.glyphListNames[listKey];
+	}
+	return listKey;
+}
+
 // 导出供全局使用
 window.i18n = {
 	t: t,
 	getCurrentLanguage: getCurrentLanguage,
 	setLanguage: setLanguage,
+	getGlyphListName: getGlyphListName,
 	languages: {
 		'zh-CN': '简体中文',
 		'zh-TW': '繁體中文',

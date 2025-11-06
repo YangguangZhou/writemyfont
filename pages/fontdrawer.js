@@ -10,6 +10,16 @@ let db;
 let settings = null;
 
 const brushes = [];
+
+// Glyph list metadata for localization and visibility rules
+const glyphListMeta = {
+	'本土包-漢字#1': { hideIn: ['zh-CN'] },
+	'本土包-漢字#2': { hideIn: ['zh-CN'] },
+	'本土包-符號': { hideIn: ['zh-CN'] },
+	'繁體字': { hideIn: ['zh-CN'] },
+	'附表：台文全羅': { hideIn: ['zh-CN'] },
+	'附表：心經': { hideIn: ['zh-CN'] }
+};
 function addBrush(imgSrc) {
 	var brush = new Image();
 	brush.src = 'data:image/png;base64,' + imgSrc;
@@ -286,10 +296,17 @@ async function initCanvas(canvas) {
 }
 
 function initListSelect($listSelect) {
+	const currentLang = window.i18n.getCurrentLanguage();
 	$listSelect.empty(); // 清空選單
 	for (var list in glyphList) {
+		if (!Object.prototype.hasOwnProperty.call(glyphList, list)) continue;
+		const meta = glyphListMeta[list];
+		if (meta && meta.hideIn && meta.hideIn.includes(currentLang)) continue;
+		const count = glyphList[list].length;
+		const localizedName = window.i18n.getGlyphListName(list);
+		const displayText = `${localizedName} (${count}${window.i18n.t('charUnit')})`;
 		$listSelect.append(
-			$('<option></option>').val(list).text(list)
+			$('<option></option>').val(list).text(displayText)
 		);
 	}
 }
@@ -1237,6 +1254,162 @@ $(document).ready(async function () {
 				alert(fdrawer.noDataToExport);
 			}
 		};
+	});
+
+	// 从文本导入字表功能
+	$('#importTextButton').on('click', function() {
+		const text = $('#importTextarea').val().trim();
+		if (!text) {
+			alert(window.i18n.t('importTextPlaceholder'));
+			return;
+		}
+		
+		// 去重并过滤字符
+		const chars = [...new Set(text.split(''))].filter(char => {
+			// 过滤空白字符和控制字符
+			return char.trim() !== '' && char.charCodeAt(0) > 32;
+		});
+		
+		let addedCount = 0;
+		let duplicateCount = 0;
+		
+		// 确保自定义字表存在
+		if (!glyphList[fdrawer.customList]) {
+			glyphList[fdrawer.customList] = [];
+		}
+		
+		// 添加字符到自定义字表
+		chars.forEach(char => {
+			// 在 glyphMap 中查找对应的 glyph
+			let glyphName = null;
+			for (let name in glyphMap) {
+				if (glyphMap[name].c === char) {
+					glyphName = name;
+					break;
+				}
+			}
+			
+			if (glyphName) {
+				// 检查是否已存在于自定义字表
+				if (!glyphList[fdrawer.customList].includes(glyphName)) {
+					glyphList[fdrawer.customList].push(glyphName);
+					addedCount++;
+				} else {
+					duplicateCount++;
+				}
+			}
+		});
+		
+		// 保存自定义字表
+		saveToDB('custom_glyphlist', glyphList[fdrawer.customList]);
+		
+		// 重新初始化字表选择器
+		const $listSelect = $('#listSelect');
+		initListSelect($listSelect);
+		$listSelect.val(fdrawer.customList);
+		$listSelect.change();
+		
+		// 清空输入框
+		$('#importTextarea').val('');
+		
+		// 显示结果
+		let message = window.i18n.t('importTextSuccess').replace('{0}', addedCount);
+		if (duplicateCount > 0) {
+			message += '\n' + window.i18n.t('importTextDuplicate').replace('{0}', duplicateCount);
+		}
+		alert(message);
+	});
+	
+	// 打开预览对话框
+	$('#openPreviewButton').on('click', function() {
+		$('#preview-container').fadeIn(200);
+	});
+	
+	// 关闭预览对话框
+	$('#closePreviewButton').on('click', function() {
+		$('#preview-container').fadeOut(200);
+	});
+	
+	// 预览字体大小滑块
+	$('#previewFontSizeSlider').on('input', function() {
+		const size = $(this).val();
+		$('#previewFontSizeValue').text(size + 'px');
+		$('#previewOutput').css('font-size', size + 'px');
+	});
+	
+	// 预览行高滑块
+	$('#previewLineHeightSlider').on('input', function() {
+		const lineHeight = $(this).val();
+		$('#previewLineHeightValue').text(lineHeight + '%');
+		$('#previewOutput').css('line-height', lineHeight + '%');
+	});
+	
+	// 预览按钮
+	$('#previewButton').on('click', async function() {
+		const text = $('#previewTextInput').val();
+		if (!text) {
+			alert(window.i18n.t('previewTextPlaceholder'));
+			return;
+		}
+		
+		const $output = $('#previewOutput');
+		$output.empty();
+
+		// 获取当前字号
+		const fontSize = parseInt($('#previewFontSizeSlider').val(), 10);
+
+		// 逐字渲染
+		for (let char of text) {
+			if (char === '\r') {
+				continue;
+			}
+			if (char === '\n') {
+				$output.append(document.createElement('br'));
+				continue;
+			}
+			// 在 glyphMap 中查找字符
+			let glyphName = null;
+			for (let name in glyphMap) {
+				if (glyphMap[name].c === char) {
+					glyphName = name;
+					break;
+				}
+			}
+			
+			if (glyphName) {
+				// 尝试从数据库加载该字的数据
+				const glyphData = await loadFromDB('g_' + glyphName);
+				
+				if (glyphData) {
+					// 创建字符的图片元素
+					const img = document.createElement('img');
+					img.style.width = fontSize + 'px';
+					img.style.height = 'auto';
+					img.style.display = 'inline-block';
+					img.style.verticalAlign = 'baseline';
+					img.alt = char;
+					img.src = glyphData;
+					$output.append(img);
+				} else {
+					// 如果没有写过这个字,显示原字符
+					const span = document.createElement('span');
+					span.textContent = char;
+					span.style.color = '#ccc';
+					$output.append(span);
+				}
+			} else {
+				// 如果不在 glyphMap 中,直接显示
+				const span = document.createElement('span');
+				span.textContent = char;
+				$output.append(span);
+			}
+		}
+	});
+	
+	// 清空预览
+	$('#previewClearButton').on('click', function() {
+		$('#previewTextInput').val('');
+		$('#previewOutput').empty();
 	});
 
     // 匯入資料
