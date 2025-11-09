@@ -103,16 +103,38 @@ const newGlyphList = {
     '繁體字': traditionalGlyphs
 };
 
+const additionalGlyphLists = {};
 // 保留原有的其他字库(排除日文和命名包)
 for (const [listName, glyphs] of Object.entries(glyphList)) {
     if (listName !== '基礎字' && !listName.startsWith('日文') && !listName.startsWith('命名')) {
-        newGlyphList[listName] = glyphs;
+        additionalGlyphLists[listName] = glyphs;
     }
 }
 
 console.log('\n新字库结构:');
 console.log(`- 基礎字: ${newGlyphList['基礎字'].length} 个`);
-console.log(`- 簡體常用字: ${newGlyphList['簡體常用字'].length} 个`);
+const SIMPLE_CHUNK_SIZE = 1000;
+const simpleChunks = [];
+for (let i = 0; i < simpleCharGlyphs.length; i += SIMPLE_CHUNK_SIZE) {
+    simpleChunks.push(simpleCharGlyphs.slice(i, i + SIMPLE_CHUNK_SIZE));
+}
+
+const finalGlyphList = {
+    '基礎字': newGlyphList['基礎字']
+};
+
+simpleChunks.forEach((chunk, index) => {
+    finalGlyphList[`簡體常用字#${index + 1}`] = chunk;
+});
+
+finalGlyphList['繁體字'] = newGlyphList['繁體字'];
+
+for (const [listName, glyphs] of Object.entries(additionalGlyphLists)) {
+    finalGlyphList[listName] = glyphs;
+}
+
+console.log(`- 簡體常用字: ${simpleCharGlyphs.length} 个`);
+console.log(`  -> 分成 ${simpleChunks.length} 组, 每组最多 ${SIMPLE_CHUNK_SIZE} 个`);
 console.log(`- 繁體字: ${newGlyphList['繁體字'].length} 个`);
 
 // 生成sglyphlist.js文件内容
@@ -122,7 +144,7 @@ const sglyphContent = `// 简体中文字库 - 基于GB2312按使用频率排序
 ${glyphMapSection}
 
 // 简体中文字符列表
-${generateGlyphListCode(newGlyphList)}
+${generateGlyphListCode(finalGlyphList)}
 `;
 
 const sglyphPath = path.join(__dirname, 'pages', 'sglyphlist.js');

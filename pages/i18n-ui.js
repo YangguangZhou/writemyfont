@@ -38,8 +38,8 @@
 		
 		const $settingsNotes = $('#settings-container .note').not('#span-welcome');
 		$settingsNotes.eq(0).text(t('scaleRateNote'));
-		$settingsH3.eq(3).text(t('smallModeLabel'));
-		$settingsNotes.eq(1).text(t('smallModeNote'));
+		$settingsH3.eq(3).text(t('canvasSizeLabel'));
+		$settingsNotes.eq(1).text(t('canvasSizeNote'));
 		$settingsH3.eq(4).text(t('gridTypeLabel'));
 		
 		// 更新格线样式选项

@@ -12,14 +12,28 @@ let settings = null;
 const brushes = [];
 
 // Glyph list metadata for localization and visibility rules
-const glyphListMeta = {
-	'本土包-漢字#1': { hideIn: ['zh-CN'] },
-	'本土包-漢字#2': { hideIn: ['zh-CN'] },
-	'本土包-符號': { hideIn: ['zh-CN'] },
-	'繁體字': { hideIn: ['zh-CN'] },
-	'附表：台文全羅': { hideIn: ['zh-CN'] },
-	'附表：心經': { hideIn: ['zh-CN'] }
-};
+const glyphListMeta = (() => {
+	const meta = {
+		'本土包-漢字#1': { hideIn: ['zh-CN'] },
+		'本土包-漢字#2': { hideIn: ['zh-CN'] },
+		'本土包-符號': { hideIn: ['zh-CN'] },
+		'繁體字': { hideIn: ['zh-CN'] },
+		'附表：台文全羅': { hideIn: ['zh-CN'] },
+		'附表：心經': { hideIn: ['zh-CN'] }
+	};
+
+	for (let i = 1; i <= 15; i++) {
+		meta[`基本包-漢字#${i}`] = { hideIn: ['zh-CN'] };
+	}
+
+	for (let i = 1; i <= 7; i++) {
+		meta[`簡體常用字#${i}`] = { hideIn: ['zh-TW'] };
+	}
+
+	meta['簡體常用字'] = { hideIn: ['zh-TW'] };
+
+	return meta;
+})();
 function addBrush(imgSrc) {
 	var brush = new Image();
 	brush.src = 'data:image/png;base64,' + imgSrc;
@@ -151,7 +165,7 @@ async function loadSettings() {
 	const settings = {
 		notNewFlag: await loadFromDB('notNewFlag', 'N') == 'Y',				// 是否為舊檔案，預設為 N
 		scaleRate: await loadFromDB('scaleRate', 100) * 1, 					// 縮放比例，預設為 100%
-		smallMode: await loadFromDB('smallMode', 'N') == 'Y',				// 是否小字模式，預設為 N
+		canvasSize: await loadFromDB('canvasSize', 360) * 1, 				// 畫布大小，預設為 360px
 		lineWidth: await loadFromDB('lineWidth', 12) * 1, 					// 筆寬，預設為 12
 		brushType: await loadFromDB('brushType', 0) * 1, 					// 筆刷類型，預設為 0
 		pressureMode: await loadFromDB('pressureMode', 'N') == 'Y',			// 筆壓模式，預設為 N
@@ -192,6 +206,19 @@ async function updateSetting(key, value) {
 		//console.log(`Updating setting ${key} to ${settings[key]}`);
 		await saveToDB(key, settings[key]);
 	}
+}
+
+// 更新畫布大小
+function updateCanvasSize() {
+	const size = settings.canvasSize || 360;
+	$('#canvas-container').css({
+		'width': size + 'px',
+		'height': size + 'px'
+	});
+	$('#canvas-container canvas').css({
+		'width': size + 'px',
+		'height': size + 'px'
+	});
 }
 
 // 初始化
@@ -393,7 +420,7 @@ $(document).ready(async function () {
 		settings = await loadSettings();
 		initListSelect($listSelect);
 		initCanvas(canvas);	// 初始化九宮格底圖
-		$('#canvas-container').toggleClass('smallmode', settings.smallMode);
+		updateCanvasSize(); // 應用畫布大小設置
 
 		$listSelect.change(); // 觸發一次 change 事件以載入第一個列表
 		
@@ -1089,11 +1116,17 @@ $(document).ready(async function () {
         $('#settings-container').show();
 		$('#fontNameEng').val(settings.fontNameEng);
 		$('#fontNameCJK').val(settings.fontNameCJK);
-		$('#smallModeCheck').prop('checked', settings.smallMode);
 		$('#noFixedWidthFlag').prop('checked', settings.noFixedWidthFlag);
+		
+		// 縮放率設置
 		var scale = settings.scaleRate; // 預設縮放比例為 100%
 		$('#scaleRateSlider').val(scale);
 		$('#scaleRateValue').text(scale + '%');
+		
+		// 畫布大小設置
+		var canvasSize = settings.canvasSize || 360;
+		$('#canvasSizeSlider').val(canvasSize);
+		$('#canvasSizeValue').text(canvasSize + 'px');
 
 		$('#pressureEffectSelect').val(settings.pressureEffect);
 		$('#pressureDrawingEnabled').prop('checked', settings.oldPressureMode);
@@ -1110,17 +1143,24 @@ $(document).ready(async function () {
 
 	$('#fontNameEng').on('change', function () { updateSetting('fontNameEng', $(this).val().replace(/[^a-zA-Z0-9 ]/g, '')); });
 	$('#fontNameCJK').on('change', function () { updateSetting('fontNameCJK', $(this).val()); });
-	$('#smallModeCheck').on('click', async function () {
-		await updateSetting('smallMode', $(this).prop('checked'));
-		$('#canvas-container').toggleClass('smallmode', settings.smallMode);
-	});
 	$('#noFixedWidthFlag').on('click', function () { updateSetting('noFixedWidthFlag', $(this).prop('checked')); });
+	
+	// 縮放率滑桿
 	$('#scaleRateSlider').on('input', function () { 
 		var rate = parseInt($(this).val(), 10);
 		$('#scaleRateValue').text(rate + '%');
 		updateSetting('scaleRate', rate);
 		initCanvas(canvas);
 	});
+	
+	// 畫布大小滑桿
+	$('#canvasSizeSlider').on('input', async function () {
+		var size = parseInt($(this).val(), 10);
+		$('#canvasSizeValue').text(size + 'px');
+		await updateSetting('canvasSize', size);
+		updateCanvasSize();
+	});
+	
 	$('#pressureEffectSelect').change(function () { updateSetting('pressureEffect', $(this).val()); });
 	$('#gridTypeSelect').change(function () { 
 		updateSetting('gridType', $(this).val());
@@ -1158,6 +1198,9 @@ $(document).ready(async function () {
 
 		for (let i in nowList) {
 			var gname = nowList[i];
+			// 跳过未定义的字符
+			if (!glyphMap[gname]) continue;
+			
 			var svgData = await loadFromDB('s_' + gname);
 			if (svgData) {		// 已寫過
 				$('#listup-body').append(
