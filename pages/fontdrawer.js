@@ -717,13 +717,13 @@ $(document).ready(async function () {
 
 	// 切換畫筆與橡皮擦模式
 	$('#penButton').on('click', function () {
-		$('#penButton').addClass('use');
-		$('#eraserButton').removeClass('use');
+		$('#penButton').addClass('active');
+		$('#eraserButton').removeClass('active');
 		eraseMode = false;
 	});
 	$('#eraserButton').on('click', function () {	
-		$('#eraserButton').addClass('use');
-		$('#penButton').removeClass('use');
+		$('#eraserButton').addClass('active');
+		$('#penButton').removeClass('active');
 		eraseMode = true; // 切換到橡皮擦模式
 	});
 
@@ -1546,9 +1546,16 @@ $(document).ready(async function () {
 			return;
 		}
 
-		// 获取当前字号与字间距
+		// 获取当前字号、行高与字间距
 		const fontSize = parseInt($('#previewFontSizeSlider').val(), 10);
+		const lineHeight = parseInt($('#previewLineHeightSlider').val(), 10) / 100;
 		const spacing = parseInt($('#previewLetterSpacingSlider').val(), 10);
+
+		// 设置容器的字号和行高，以便正常文字与图片大小一致
+		$output.css({
+			'font-size': fontSize + 'px',
+			'line-height': lineHeight
+		});
 
 		// 逐字渲染
 		for (let char of text) {
@@ -1580,9 +1587,9 @@ $(document).ready(async function () {
 					// 创建字符 of 图片元素
 					const img = document.createElement('img');
 					img.style.width = fontSize + 'px';
-					img.style.height = 'auto';
+					img.style.height = fontSize + 'px'; // 保持方形，和画布一致
 					img.style.display = 'inline-block';
-					img.style.verticalAlign = 'baseline';
+					img.style.verticalAlign = 'bottom'; // 使图片底部与文字底部对齐
 					img.style.marginRight = spacing + 'px';
 					img.alt = char;
 					img.src = glyphData;
