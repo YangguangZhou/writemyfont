@@ -27,6 +27,7 @@
             <h1>手寫字型產生器</h1>
         </div>
         <div class="header-controls">
+            <button id="openPreviewButtonHeader" class="icon-btn" title="預覽"><i class="fas fa-eye"></i></button>
             <button id="langButton" class="icon-btn" title="語言/Language"><i class="fas fa-globe"></i></button>
             <button id="settingButton" class="icon-btn" title="設定"><i class="fas fa-cog"></i></button>
             <button id="hintButton" class="icon-btn" title="說明"><i class="fas fa-question-circle"></i></button>
@@ -122,6 +123,7 @@
                 <span id="closeLangButton" class="close-btn"><i class="fas fa-times"></i></span>
                 <h2 id="lang-title">語言 / Language</h2>
                 <div id="lang-options">
+                    <button class="lang-option" data-lang="en">English</button>
                     <button class="lang-option" data-lang="zh-CN">简体中文</button>
                     <button class="lang-option" data-lang="zh-TW">繁體中文</button>
                     <button class="lang-option" data-lang="ja">日本語</button>
@@ -169,23 +171,23 @@
                 <h2 id="settings-title">設定</h2>
                 <span class="note" id="span-welcome">在開始書寫之前，先來設定一些基本資訊吧！這些設定值之後都能再更改。<br>提醒您，若您是在App內的瀏覽器開啟本頁，建議用系統瀏覽器開啟，避免資料遺失！</span>
 
-                <h3>字型英文名稱</h3>
+                <h3 id="fontNameEngLabel">字型英文名稱</h3>
                 <input id="fontNameEng" type="text" placeholder="請輸入英文名稱" maxlength="24" />
 
-                <h3>字型中文名稱</h3>
+                <h3 id="fontNameCJKLabel">字型中文名稱</h3>
                 <input id="fontNameCJK" type="text" placeholder="請輸入中文名稱" maxlength="10" />
                 
-                <h3>縮放率</h3>
-                <input id="scaleRateSlider" type="range" min="80" max="200" value="100" />
+                <h3 id="scaleRateLabel">縮放率</h3>
+                <input id="scaleRateSlider" type="range" min="25" max="150" value="100" />
                 <span id="scaleRateValue">100%</span>
-                <span class="note">手寫時為了避免超框，容易不經意把字寫得偏小。這裡可以調整文字框的尺寸。</span>
+                <span class="note" id="scaleRateNote">手寫時為了避免超框，容易不經意把字寫得偏小。這裡可以調整文字框的尺寸。</span>
 
-                <h3>畫布大小</h3>
+                <h3 id="canvasSizeLabel">畫布大小</h3>
                 <input id="canvasSizeSlider" type="range" min="100" max="400" value="360" step="10" />
                 <span id="canvasSizeValue">360px</span>
-                <span class="note">調整書寫區域的實際顯示大小（200px - 400px）。</span>
+                <span class="note" id="canvasSizeNote">調整書寫區域的實際顯示大小（200px - 400px）。</span>
 
-                <h3>背景格線樣式</h3>
+                <h3 id="gridTypeLabel">背景格線樣式</h3>
                 <select id="gridTypeSelect">
                     <option value="3x3grid">九宮格</option>
                     <option value="3x3grid-new">新九宮格</option>
@@ -195,30 +197,30 @@
                     <option value="nogrid">無格線（僅字身框）</option>
                 </select>
 
-                <h3>顯示基線參考線</h3>
+                <h3 id="showBaselineLabel">顯示基線參考線</h3>
                 <input id="showBaselineCheck" type="checkbox" checked />
-                <span class="note">基線參考線位於字框下方 3/4 處，主要用於對齊半形字符。</span>
+                <span class="note" id="showBaselineNote">基線參考線位於字框下方 3/4 處，主要用於對齊半形字符。</span>
 
-                <h3>中文字不等寬</h3>
+                <h3 id="noFixedWidthLabel">中文字不等寬</h3>
                 <input id="noFixedWidthFlag" type="checkbox" />
-                <span class="note">設定為不等寬會更像手寫字型，但可能不適合用於直排。</span>
+                <span class="note" id="noFixedWidthNote">設定為不等寬會更像手寫字型，但可能不適合用於直排。</span>
 
-                <h3>筆壓敏感度（實驗中）</h3>
+                <h3 id="pressureEffectLabel">筆壓敏感度（實驗中）</h3>
                 <select id="pressureEffectSelect">
                     <option value="none">原始值</option>
                     <option value="contrast">加大對比</option>
                     <option value="enhance">增強（省力）</option>
                     <option value="enhancex">再增強（更省力）</option>
                 </select>
-                <span class="note">本選項僅對有筆壓的設備有效。目前尚在調整中，未來修改可能無法維持舊版相容性。</span>
+                <span class="note" id="pressureEffectNote">本選項僅對有筆壓的設備有效。目前尚在調整中，未來修改可能無法維持舊版相容性。</span>
 
-                <h3>啟用觸控筆傾斜角</h3>
+                <h3 id="penAngleModeLabel">啟用觸控筆傾斜角</h3>
                 <input id="penAngleMode" type="checkbox" />
-                <span class="note">本選項僅對有傾斜角的設備有效。</span>
+                <span class="note" id="penAngleModeNote">本選項僅對有傾斜角的設備有效。</span>
 
-                <h3>啟用舊筆壓模式（不建議）</h3>
+                <h3 id="pressureDrawingLabel">啟用舊筆壓模式（不建議）</h3>
                 <input id="pressureDrawingEnabled" type="checkbox" />
-                <span class="note">舊筆壓模式無法支援筆刷功能。</span>
+                <span class="note" id="pressureDrawingNote">舊筆壓模式無法支援筆刷功能。</span>
 
                 <div id="div-backup">
                 <br />
@@ -236,10 +238,13 @@
                 <br />
                 <br />
                 <hr />
-                <h3>完全清除字型資料</h3>
+                <h3 id="clearAllLabel">完全清除字型資料</h3>
                 <button id="clearAllButton">清除字型資料（無法復原！）</button>
                 <br />
-                <h3>匯出系統事件（開發用）</h3>
+                <h3 id="resetSettingsLabel">重置所有設定</h3>
+                <button id="resetSettingsButton">將配置還原至預設值</button>
+                <br />
+                <h3 id="exportEventsLabel">匯出系統事件（開發用）</h3>
                 <button id="exportEventsButton">匯出系統事件</button>
                 <br />
                 </div>
@@ -293,13 +298,18 @@
                     <span id="previewFontSizeValue">48px</span>
                 </div>
                 
-                <div style="margin-bottom: 15px;">
+                 <div style="margin-bottom: 15px;">
                     <label for="previewLineHeightSlider" id="previewLineHeightLabel">行高：</label>
                     <input id="previewLineHeightSlider" type="range" min="100" max="200" value="150" style="width: 200px;" />
                     <span id="previewLineHeightValue">150%</span>
                 </div>
                 
-                <button id="previewButton">預覽</button>
+                <div style="margin-bottom: 15px;">
+                    <label for="previewLetterSpacingSlider" id="previewLetterSpacingLabel">字間距：</label>
+                    <input id="previewLetterSpacingSlider" type="range" min="-10" max="50" value="0" style="width: 200px;" />
+                    <span id="previewLetterSpacingValue">0px</span>
+                </div>
+                
                 <button id="previewClearButton">清空</button>
                 
                 <hr style="margin: 20px 0;">

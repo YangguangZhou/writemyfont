@@ -1,5 +1,177 @@
 // 多语言配置
 const i18n = {
+	// English
+	'en': {
+		title: 'Handwritten Font Generator',
+		appTitle: 'Handwritten Font Generator',
+		downloadButtonText: 'Download Font',
+		listLabel: 'Lists: ',
+		charSeqLabel: 'Character List',
+		charUnit: ' chars',
+		welcomeTitle: 'Welcome to Handwritten Font Generator!',
+		settingsTitle: 'Font Settings',
+		downloadTitle: 'Download',
+		hintTitle: 'Tips',
+		
+		// 按钮文字
+		findButton: '🔍',
+		prevButton: '👈',
+		nextButton: '👉',
+		clearButton: '🚮',
+		moveLeftButton: '⬅️',
+		moveRightButton: '➡️',
+		moveUpButton: '⬆️',
+		moveDownButton: '⬇️',
+		undoButton: '↩️',
+		hintButton: '💡',
+		settingButton: '⚙️',
+		downloadButton: '💾',
+		langButton: '🌐',
+		
+		// 设置页面
+		spanWelcome: 'Before you start writing, please set the basic info. These settings can be changed later.<br>Tip: If you open this in an in-app browser, we recommend switching to a system browser to avoid data loss!',
+		fontNameEngLabel: 'English Font Name',
+		fontNameEngPlaceholder: 'Enter English name',
+		fontNameCJKLabel: 'CJK Font Name',
+		fontNameCJKPlaceholder: 'Enter CJK name',
+		scaleRateLabel: 'Writing Box Zoom',
+		scaleRateNote: 'Adjust writing box size. Writing can naturally get smaller; shrink the box to enlarge the output font.',
+		canvasSizeLabel: 'Canvas Display Size',
+		canvasSizeNote: 'Adjust display size of the canvas on screen. Does not affect the output font.',
+		gridTypeLabel: 'Grid Guidelines Style',
+		gridTypes: {
+			'3x3grid': '3x3 Grid',
+			'3x3grid-new': 'New 3x3 Grid',
+			'2x2grid': '2x2 Grid',
+			'stargrid': 'Star Grid',
+			'boxgrid': 'Box Grid',
+			'nogrid': 'No Grid (Body box only)'
+		},
+		showBaselineLabel: 'Show Baseline Reference',
+		showBaselineNote: 'The baseline reference is located at 3/4 from the top, mainly used to align half-width characters.',
+		noFixedWidthLabel: 'Proportional Width for CJK',
+		noFixedWidthNote: 'Proportional CJK characters look closer to natural handwriting, but may not suit vertical layout.',
+		pressureEffectLabel: 'Pressure Sensitivity (Experimental)',
+		pressureEffects: {
+			'none': 'Original Value',
+			'contrast': 'Increase Contrast',
+			'enhance': 'Enhance (Less Effort)',
+			'enhancex': 'Super Enhance (Effortless)'
+		},
+		pressureEffectNote: 'Only works on devices supporting pen pressure sensitivity. This feature is in beta and might change.',
+		penAngleModeLabel: 'Enable Stylus Tilt Detection',
+		penAngleModeNote: 'Only works on devices that support pen tilt.',
+		pressureDrawingLabel: 'Use Old Pen Pressure Mode (Not Recommended)',
+		pressureDrawingNote: 'The legacy pressure drawing mode does not support brush shapes.',
+		clearAllLabel: 'Clear All Font Data',
+		clearAllButton: 'Clear Font Data (This action is irreversible!)',
+		resetSettingsLabel: 'Reset All Settings',
+		resetSettingsButton: 'Restore Settings to Default',
+		resetSettingsConfirm: 'Are you sure you want to restore all settings to default values? Your drawn character data will NOT be deleted.',
+		resetSettingsDone: 'Settings have been reset.',
+		exportEventsLabel: 'Export System Events (For Debug)',
+		exportEventsButton: 'Export System Events',
+		
+		// 下载页面
+		saveAsTesterLabel: 'Test Output Name',
+		saveAsTesterNote: 'If checked, an incremental number is appended to the font name to bypass OS font cache issues.',
+		downloadFontButton: 'Download Font File (OTF Format)',
+		donateTitle: 'Support the Author',
+		donateText: 'The rights to the generated font files belong entirely to you. If this tool helped you, feel free to support the author via <a href="https://www.paypal.com/paypalme/buttaiwan" target="_blank">PayPal</a>. Your support helps us keep improving!',
+		importDataLabel: 'Import Backup Data',
+		exportDataLabel: 'Export Current Data',
+		exportDataButton: 'Backup Font Data',
+		
+		// 提示内容
+		hintContent: [
+			'Character lists are based on "jf7000 common characters set".',
+			'All data is saved locally in your browser. We suggest exporting backups regularly to prevent data loss.',
+			'We recommend adjusting position (usually CJK is centered) right after drawing each character, which is easier than bulk adjustment later.',
+			'Half-width characters are output with proportional width; horizontal position is ignored. Red line shows the baseline reference.',
+			'Full-width alphanumeric characters are automatically generated from half-width ones.',
+			'Once mandatory characters are completed, vertical layout and composite settings are processed automatically.',
+			'Note: Due to technical limits, the generated OTF files work but are not in standard CID format, and CJK font recognition in Adobe apps may fail.',
+			'The service and author are not responsible for any issues caused by using the generated font files.',
+			'This service does not collect your handwriting or personal info. Please assess risks before sharing your fonts.',
+			'This tool is updated irregularly. All source code is open on GitHub; contact the author for technical support requests.',
+			'Project GitHub page: <a href="https://github.com/ButTaiwan/writemyfont" target="_blank">View Source Code</a>.'
+		],
+		
+		// 消息文本
+		findMsg: 'Enter character to search:',
+		notFound: 'Character not found!',
+		confirmAdd: 'Would you like to add it to the User List?',
+		noDataToExport: 'No data to export.',
+		importConfirm: 'Are you sure you want to import data? All current unsaved edits will be overwritten.',
+		importDone: 'Import completed.',
+		clearConfirm: 'Are you sure you want to clear all drawn characters?',
+		clearDone: 'Cleared.',
+		inAppNotice: 'Please open in system browser for the best experience.',
+		customList: 'User List',
+		
+		// 导入字表功能
+		importFromText: 'Import List from Text',
+		importTextLabel: 'Input Text',
+		importTextPlaceholder: 'Paste or type characters to import...',
+		importTextButton: 'Import to User List',
+		importTextNote: 'Duplicate characters will be filtered out, and new characters will be appended to the User List.',
+		importTextSuccess: 'Successfully imported {0} characters to the User List',
+		importTextDuplicate: 'Filtered {0} duplicates',
+		
+		// 预览功能
+		previewFont: 'Preview Font',
+		openPreviewButton: 'Open Preview',
+		previewTextLabel: 'Preview Text',
+		previewTextPlaceholder: 'Type text to preview...',
+		previewButton: 'Preview',
+		previewNote: 'Only displays written characters',
+		previewFontSize: 'Font Size',
+		previewLineHeight: 'Line Height',
+		previewClear: 'Clear',
+		previewLetterSpacing: 'Letter Spacing',
+		
+		// 字表名称
+		glyphListNames: {
+			'基礎字': 'Base Glyphs',
+			'簡體常用字': 'Simplified CJK Common',
+			'簡體常用字#1': 'Simplified CJK #1',
+			'簡體常用字#2': 'Simplified CJK #2',
+			'簡體常用字#3': 'Simplified CJK #3',
+			'簡體常用字#4': 'Simplified CJK #4',
+			'簡體常用字#5': 'Simplified CJK #5',
+			'簡體常用字#6': 'Simplified CJK #6',
+			'簡體常用字#7': 'Simplified CJK #7',
+			'繁體字': 'Traditional CJK',
+			'基本包-漢字#1': 'Basic CJK #1',
+			'基本包-漢字#2': 'Basic CJK #2',
+			'基本包-漢字#3': 'Basic CJK #3',
+			'基本包-漢字#4': 'Basic CJK #4',
+			'基本包-漢字#5': 'Basic CJK #5',
+			'基本包-漢字#6': 'Basic CJK #6',
+			'基本包-漢字#7': 'Basic CJK #7',
+			'基本包-漢字#8': 'Basic CJK #8',
+			'基本包-漢字#9': 'Basic CJK #9',
+			'基本包-漢字#10': 'Basic CJK #10',
+			'基本包-漢字#11': 'Basic CJK #11',
+			'基本包-漢字#12': 'Basic CJK #12',
+			'基本包-漢字#13': 'Basic CJK #13',
+			'基本包-漢字#14': 'Basic CJK #14',
+			'基本包-漢字#15': 'Basic CJK #15',
+			'基本包-符號': 'Basic Symbols',
+			'本土包-漢字#1': 'Local CJK #1',
+			'本土包-漢字#2': 'Local CJK #2',
+			'本土包-符號': 'Local Symbols',
+			'日文包-漢字#1': 'Japanese CJK #1',
+			'日文包-漢字#2': 'Japanese CJK #2',
+			'日文包-符號': 'Japanese Symbols',
+			'粵語包-漢字': 'Cantonese CJK',
+			'命名包-漢字#1': 'Naming CJK #1',
+			'命名包-漢字#2': 'Naming CJK #2',
+			'補充符號包': 'Supplemental Symbols',
+			'附表：台文全羅': 'Taiwanese Romanization',
+			'附表：心經': 'Heart Sutra'
+		}
+	},
 	// 简体中文
 	'zh-CN': {
 		title: '手写字体生成器',
@@ -67,6 +239,10 @@ const i18n = {
 		clearAllButton: '清空字体数据（此操作不可恢复！）',
 		exportEventsLabel: '导出系统事件（开发用）',
 		exportEventsButton: '导出系统事件',
+		resetSettingsLabel: '重置所有设置',
+		resetSettingsButton: '将配置还原至默认值',
+		resetSettingsConfirm: '确定要将所有设置还原为默认值吗？字形数据不会被删除。',
+		resetSettingsDone: '设置已还原。',
 		
 		// 下载页面
 		saveAsTesterLabel: '测试输出',
@@ -124,6 +300,7 @@ const i18n = {
 		previewFontSize: '字号',
 		previewLineHeight: '行高',
 		previewClear: '清空',
+		previewLetterSpacing: '字间距',
 		
 		// 字表名称
 		glyphListNames: {
@@ -233,6 +410,10 @@ const i18n = {
 		clearAllButton: '清除字型資料（無法復原！）',
 		exportEventsLabel: '匯出系統事件（開發用）',
 		exportEventsButton: '匯出系統事件',
+		resetSettingsLabel: '重置所有設定',
+		resetSettingsButton: '將配置還原至預設值',
+		resetSettingsConfirm: '確定要將所有設定還原為預設值嗎？已書寫的字型資料不會被刪除。',
+		resetSettingsDone: '設定已還原。',
 		
 		saveAsTesterLabel: '測試輸出',
 		saveAsTesterNote: '勾選測試輸出，字型名稱會加上流水號。避免系統快取造成在電腦上無法正常安裝使用的問題。',
@@ -287,6 +468,7 @@ const i18n = {
 		previewFontSize: '字號',
 		previewLineHeight: '行高',
 		previewClear: '清空',
+		previewLetterSpacing: '字間距',
 		
 		// 字表名稱
 		glyphListNames: {
@@ -396,6 +578,10 @@ const i18n = {
 		clearAllButton: '全てのデータを削除（復元不能！）',
 		exportEventsLabel: 'システムデバッグ用機能',
 		exportEventsButton: 'システムイベントエクスポート',
+		resetSettingsLabel: '設定のリセット',
+		resetSettingsButton: '設定を初期値に戻す',
+		resetSettingsConfirm: 'すべての設定を初期値に戻しますか？書かれたフォントデータは削除されません。',
+		resetSettingsDone: '設定をリセットしました。',
 		
 		saveAsTesterLabel: 'テスト出力',
 		saveAsTesterNote: 'テスト出力モードでは、フォント名に通し番号がつけられます。パソコンのフォントキャッシュによるインストールや使用の不具合を避けることができます。',
@@ -452,6 +638,7 @@ const i18n = {
 		previewFontSize: 'フォントサイズ',
 		previewLineHeight: '行の高さ',
 		previewClear: 'クリア',
+		previewLetterSpacing: '文字間隔',
 		
 		// 字表名称
 		glyphListNames: {
@@ -499,16 +686,18 @@ const i18n = {
 
 // 获取浏览器语言
 function getBrowserLanguage() {
-	const lang = navigator.language || navigator.userLanguage;
-	if (lang.startsWith('zh-CN') || lang.startsWith('zh-Hans')) {
+	const lang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+	if (lang.startsWith('zh-cn') || lang.startsWith('zh-hans')) {
 		return 'zh-CN';
-	} else if (lang.startsWith('zh-TW') || lang.startsWith('zh-Hant') || lang.startsWith('zh-HK')) {
+	} else if (lang.startsWith('zh-tw') || lang.startsWith('zh-hant') || lang.startsWith('zh-hk')) {
 		return 'zh-TW';
 	} else if (lang.startsWith('ja')) {
 		return 'ja';
+	} else if (lang.startsWith('en')) {
+		return 'en';
 	}
-	// 默认返回繁体中文
-	return 'zh-TW';
+	// 默认返回英文
+	return 'en';
 }
 
 // 获取或设置当前语言
@@ -550,10 +739,162 @@ function translateGlyphNote(n) {
 	const lang = getCurrentLanguage();
 	if (lang === 'zh-TW') return n;
 	
+	if (lang === 'en') {
+		const enMap = {
+			'小寫字母': 'Lowercase Letters',
+			'大寫字母': 'Uppercase Letters',
+			'數字': 'Numbers',
+			'平假名': 'Hiragana',
+			'片假名': 'Katakana',
+			'注音符號': 'Bopomofo',
+			'心經': 'Heart Sutra',
+			'希臘字母': 'Greek Letters',
+			'希臘文': 'Greek',
+			'白話字': 'Pe̍h-ōe-jī (POJ)',
+			'客語白話字': 'Hakka POJ',
+			'白話字/漢拼': 'POJ / Pinyin',
+			'台羅/白話字': 'Tailo / POJ',
+			'台羅/白話字/漢拼': 'Tailo / POJ / Pinyin',
+			'漢拼': 'Hanyu Pinyin',
+			'方音符號': 'Minnan Phonetic Symbols',
+			'客語調號': 'Hakka Tone Marks',
+			'注音二聲': 'Bopomofo Tone 2',
+			'注音三聲': 'Bopomofo Tone 3',
+			'注音四聲': 'Bopomofo Tone 4',
+			'注音輕聲': 'Bopomofo Neutral Tone',
+			'馬祖福州話': 'Matsu Fuzhou Dialect',
+			'族語': 'Formosan Languages',
+			'度': 'Degrees',
+			'角': 'Angle',
+			'中點': 'Middle Dot',
+			'乘號': 'Multiplication Sign',
+			'米號': 'Asterisk',
+			'商標': 'Trademark',
+			'箭頭': 'Arrow',
+			'直角': 'Right Angle',
+			'平行': 'Parallel',
+			'交集': 'Intersection',
+			'聯集': 'Union',
+			'積分': 'Integral',
+			'所以': 'Therefore',
+			'因為': 'Because',
+			'全等': 'Congruent',
+			'雙圈': 'Double Circle',
+			'重複': 'Repetitive',
+			'長音': 'Macron (Long Vowel)',
+			'章節號': 'Section Sign',
+			'版權號': 'Copyright Sign',
+			'中黑點': 'Middle Dot',
+			'省略號': 'Ellipsis',
+			'音界號': 'Word Separator',
+			'千分號': 'Per Mille Sign',
+			'反撇號': 'Backtick',
+			'雙問號': 'Double Question',
+			'平方根': 'Square Root',
+			'無限大': 'Infinity',
+			'約等於': 'Approximately Equal',
+			'不等於': 'Not Equal',
+			'表格線': 'Table Border',
+			'波浪號': 'Tilde',
+			'美分符號': 'Cent Sign',
+			'英鎊符號': 'Pound Sign',
+			'日圓符號': 'Yen Sign',
+			'註冊商標': 'Registered Trademark',
+			'雙驚嘆號': 'Double Exclamation',
+			'歐元符號': 'Euro Sign',
+			'攝氏符號': 'Celsius Sign',
+			'華氏符號': 'Fahrenheit Sign',
+			'羅馬數字': 'Roman Numerals',
+			'全形斜線': 'Full-width Slash',
+			'環路積分': 'Contour Integral',
+			'小於大於': 'Less/Greater Than',
+			'大於等於': 'Greater Than or Equal',
+			'垂直記號': 'Perpendicular',
+			'製圖符號': 'Drafting Symbols',
+			'實心圓形': 'Solid Circle',
+			'空心圓形': 'Outline Circle',
+			'實心方形': 'Solid Square',
+			'空心方形': 'Outline Square',
+			'實心菱形': 'Solid Diamond',
+			'空心菱形': 'Outline Diamond',
+			'實心星號': 'Solid Star',
+			'空心星號': 'Outline Star',
+			'實心心號': 'Solid Heart',
+			'空心心號': 'Outline Heart',
+			'重複漢字': 'Repetitive Hanzi',
+			'半形 And': 'Half-width Ampersand',
+			'半形And': 'Half-width Ampersand',
+			'半形雙引號': 'Half-width Double Quote',
+			'半形單引號': 'Half-width Single Quote',
+			'半形驚嘆號': 'Half-width Exclamation Mark',
+			'半形井號': 'Half-width Hash',
+			'半形錢號': 'Half-width Dollar Sign',
+			'半形百分號': 'Half-width Percent',
+			'半形傻瓜引號': 'Half-width Neutral Quote',
+			'半形括號': 'Half-width Parenthesis',
+			'半形星號': 'Half-width Asterisk',
+			'半形加號': 'Half-width Plus',
+			'半形逗號': 'Half-width Comma',
+			'半形減號/連字號': 'Half-width Hyphen',
+			'半形句點': 'Half-width Period',
+			'半形正斜線': 'Half-width Slash',
+			'半形冒號': 'Half-width Colon',
+			'半形分號': 'Half-width Semicolon',
+			'半形小於': 'Half-width Less Than',
+			'半形等號': 'Half-width Equal',
+			'半形大於': 'Half-width Greater Than',
+			'半形問號': 'Half-width Question Mark',
+			'半形中括號': 'Half-width Bracket',
+			'半形倒斜線': 'Half-width Backslash',
+			'半形抑揚符': 'Half-width Caret',
+			'半形底線': 'Half-width Underscore',
+			'半形重音符': 'Half-width Backtick',
+			'半形大括號': 'Half-width Brace',
+			'半形垂直線': 'Half-width Vertical Bar',
+			'半形波浪號': 'Half-width Tilde'
+		};
+		if (enMap[n]) return enMap[n];
+		
+		let res = n;
+		res = res.replace(/半形/g, 'Half-width ')
+		         .replace(/全形/g, 'Full-width ')
+		         .replace(/字母/g, 'Letters')
+		         .replace(/驚嘆號/g, 'Exclamation')
+		         .replace(/問號/g, 'Question')
+		         .replace(/括引號/g, 'Brackets/Quotes')
+		         .replace(/括號/g, 'Brackets')
+		         .replace(/引號/g, 'Quotes')
+		         .replace(/逗號/g, 'Comma')
+		         .replace(/句點/g, 'Period')
+		         .replace(/頓號/g, 'Ideographic Comma')
+		         .replace(/斜線/g, 'Slash')
+		         .replace(/直排相容/g, 'Vertical Layout Compatible')
+		         .replace(/希臘/g, 'Greek')
+		         .replace(/符號/g, 'Symbol')
+		         .replace(/數字/g, 'Numbers')
+		         .replace(/羅馬/g, 'Roman')
+		         .replace(/俄文/g, 'Cyrillic')
+		         .replace(/日文/g, 'Japanese')
+		         .replace(/注音/g, 'Bopomofo')
+		         .replace(/空心/g, 'Outline ')
+		         .replace(/實心/g, 'Solid ')
+		         .replace(/圓形/g, 'Circle')
+		         .replace(/方形/g, 'Square')
+		         .replace(/菱形/g, 'Diamond')
+		         .replace(/三角形/g, 'Triangle')
+		         .replace(/星號/g, 'Star')
+		         .replace(/心號/g, 'Heart');
+		return res;
+	}
+	
 	if (lang === 'zh-CN') {
 		let res = n;
+		// 替换半形和全形为半角和全角，避免误伤圆形、三角形等
+		res = res.replace(/半形/g, '半角')
+		         .replace(/全形/g, '全角');
+		         
+		// 替换其他繁体字
 		res = res.replace(/寫/g, '写')
-		         .replace(/形/g, '角')
 		         .replace(/號/g, '号')
 		         .replace(/數/g, '数')
 		         .replace(/體/g, '体')
@@ -570,7 +911,44 @@ function translateGlyphNote(n) {
 		         .replace(/補/g, '补')
 		         .replace(/漢字/g, '汉字')
 		         .replace(/符號/g, '符号')
-		         .replace(/驚嘆/g, '感叹');
+		         .replace(/驚嘆/g, '感叹')
+		         .replace(/希臘/g, '希腊')
+		         .replace(/白話/g, '白话')
+		         .replace(/客語/g, '客语')
+		         .replace(/族語/g, '族语')
+		         .replace(/調號/g, '调号')
+		         .replace(/調/g, '调')
+		         .replace(/語/g, '语')
+		         .replace(/聲/g, '声')
+		         .replace(/輕/g, '轻')
+		         .replace(/方音/g, '方音')
+		         .replace(/吳語/g, '吴语')
+		         .replace(/舊/g, '旧')
+		         .replace(/國/g, '国')
+		         .replace(/製/g, '制')
+		         .replace(/圖/g, '图')
+		         .replace(/實/g, '实')
+		         .replace(/重複/g, '重复')
+		         .replace(/蘇/g, '苏')
+		         .replace(/熱/g, '热')
+		         .replace(/攝/g, '摄')
+		         .replace(/華/g, '华')
+		         .replace(/羅/g, '罗')
+		         .replace(/學/g, '学')
+		         .replace(/運/g, '运')
+		         .replace(/圓/g, '圆')
+		         .replace(/屬/g, '属')
+		         .replace(/與/g, '与')
+		         .replace(/開/g, '开')
+		         .replace(/關/g, '关')
+		         .replace(/邊/g, '边')
+		         .replace(/繪/g, '绘')
+		         .replace(/標/g, '标')
+		         .replace(/註/g, '注')
+		         .replace(/劃/g, '划')
+		         .replace(/單/g, '单')
+		         .replace(/對/g, '对')
+		         .replace(/應/g, '应');
 		return res;
 	}
 	
@@ -613,6 +991,7 @@ window.i18n = {
 	getGlyphListName: getGlyphListName,
 	translateGlyphNote: translateGlyphNote,
 	languages: {
+		'en': 'English',
 		'zh-CN': '简体中文',
 		'zh-TW': '繁體中文',
 		'ja': '日本語'

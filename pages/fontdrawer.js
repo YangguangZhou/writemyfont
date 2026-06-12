@@ -199,6 +199,59 @@ function clearDB() {
 	});
 }
 
+// 清除 IndexedDB 中的字形資料 (以 g_ 與 s_ 開頭)
+function clearFontData() {
+	return new Promise((resolve, reject) => {
+		const transaction = db.transaction([storeName], 'readwrite');
+		const store = transaction.objectStore(storeName);
+		const cursorRequest = store.openCursor();
+
+		cursorRequest.onsuccess = function (event) {
+			const cursor = event.target.result;
+			if (cursor) {
+				const key = cursor.key;
+				if (key.startsWith('g_') || key.startsWith('s_')) {
+					store.delete(key);
+				}
+				cursor.continue();
+			} else {
+				resolve();
+			}
+		};
+
+		cursorRequest.onerror = function (event) {
+			reject(event.target.error);
+		};
+	});
+}
+
+// 重置所有設定 (刪除設定鍵值，使其回到預設值)
+async function resetSettingsDB() {
+	const settingKeys = [
+		'notNewFlag',
+		'scaleRate',
+		'canvasSize',
+		'lineWidth',
+		'brushType',
+		'pressureMode',
+		'pressureEffect',
+		'penAngleMode',
+		'gridType',
+		'oldPressureMode',
+		'showBaseline',
+		'fontNameEng',
+		'fontNameCJK',
+		'noFixedWidthFlag',
+		'saveAsTester',
+		'testSerialNo',
+		'customGlyphs',
+		'custom_glyphlist'
+	];
+	for (const key of settingKeys) {
+		await deleteFromDB(key);
+	}
+}
+
 // 讀取設定
 async function loadSettings() {
 	const settings = {
@@ -266,7 +319,7 @@ async function initCanvas(canvas) {
 	canvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
 	canvas.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 
-	var scale = parseInt(settings.scaleRate, 10) / 100; // 轉換為小數
+	var scale = 1 / (parseInt(settings.scaleRate, 10) / 100); // 轉換為小數 (反轉邏輯：數值越大框越大)
 
 	// 繪製底圖
 	const gridCanvas = document.getElementById('gridCanvas');
@@ -367,6 +420,14 @@ function initListSelect($listSelect) {
 	$listSelect.empty(); // 清空選單
 	for (var list in glyphList) {
 		if (!Object.prototype.hasOwnProperty.call(glyphList, list)) continue;
+		
+		// 英語特別過濾：就只需要基礎字、補充符號包、基本包-符號和使用者字表
+		if (currentLang === 'en') {
+			if (list !== '基礎字' && list !== '補充符號包' && list !== '基本包-符號' && list !== fdrawer.customList) {
+				continue;
+			}
+		}
+		
 		const meta = glyphListMeta[list];
 		if (meta && meta.hideIn && meta.hideIn.includes(currentLang)) continue;
 		const count = glyphList[list].length;
@@ -574,11 +635,11 @@ $(document).ready(async function () {
 		const savedCanvas = await loadFromDB('g_' + glyph);
 		if (savedCanvas) {
 			const img = new Image();
-			img.src = savedCanvas;
 			img.onload = function () {
 				ctx.clearRect(0, 0, canvas.width, canvas.height);
 				ctx.drawImage(img, 0, 0);
 			};
+			img.src = savedCanvas;
 		}
 	}
 
@@ -747,34 +808,13 @@ $(document).ready(async function () {
 	var eraseMode = false;
 
 	function drawBrush(ctx, brush, x, y, lw, angle) {
-		if (userAgent.includes('macintosh') && userAgent.includes('safari') && !userAgent.includes('chrome')) {
-			// 在 Mac Safari 上使用臨時 canvas 繪製，避免直接繪圖造成污垢
-			// 不知道為什麼我的Mac-Safari直接繪圖會很髒，只好建立一個臨時的畫筆 canvas
-			// 但這會造成Android上很慢，所以只在Mac-Safari上使用
-			const brushCanvas = document.createElement('canvas');
-			brushCanvas.width = lw;
-			brushCanvas.height = lw;
-			const brushCtx = brushCanvas.getContext('2d');
-			
-			if (typeof(angle) == 'undefined') angle = 0;
-			brushCtx.save();
-			brushCtx.translate(lw/2, lw/2);
-			brushCtx.rotate(angle);
-			brushCtx.translate(-lw/2, -lw/2);
-			brushCtx.drawImage(brush, 0, 0, lw, lw);
-			brushCtx.restore();
-	
-			ctx.drawImage(brushCanvas, x - lw/2, y - lw/2);
-		} else {
-			// 其他瀏覽器直接繪製
-			if (typeof(angle) == 'undefined') angle = 0;
-			ctx.save();
-			ctx.translate(x, y);
-			ctx.rotate(angle);
-			ctx.translate(-x, -y);
-			ctx.drawImage(brush, x - lw/2, y - lw/2, lw+1, lw+1);
-			ctx.restore();
-		}
+		if (typeof(angle) == 'undefined') angle = 0;
+		ctx.save();
+		ctx.translate(x, y);
+		ctx.rotate(angle);
+		ctx.translate(-x, -y);
+		ctx.drawImage(brush, x - lw/2, y - lw/2, lw+1, lw+1);
+		ctx.restore();
 	}
 
     // 開始繪製
@@ -908,12 +948,12 @@ $(document).ready(async function () {
         if (undoStack.length > 0) {
             const lastState = undoStack.pop();
             const img = new Image();
-            img.src = lastState;
             img.onload = function () {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(img, 0, 0);
                 saveToLocalDB(); // 復原後更新 Local Storage
             };
+            img.src = lastState;
         }
     });
 
@@ -949,12 +989,12 @@ $(document).ready(async function () {
 		undoStack.push(canvas.toDataURL()); // 儲存當前畫布狀態到 undoStack
 
 		const img = new Image();
-		img.src = savedCanvas;
 		img.onload = function () {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			ctx.drawImage(img, xoff, yoff);
 			saveToLocalDB(); // 更新 Local Storage
 		};
+		img.src = savedCanvas;
 	}
 
 	$('#moveLeftButton').on('click', function () { moveGlyph(-10, 0); }); // 向左移動 10px
@@ -968,7 +1008,6 @@ $(document).ready(async function () {
 		undoStack.push(canvas.toDataURL()); // 儲存當前畫布狀態到 undoStack
 
 		const img = new Image();
-		img.src = savedCanvas;
 		img.onload = function () {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			const newWidth = canvas.width * scaleRatio;
@@ -978,6 +1017,7 @@ $(document).ready(async function () {
 			ctx.drawImage(img, dx, dy, newWidth, newHeight);
 			saveToLocalDB(); // 更新 Local Storage
 		};
+		img.src = savedCanvas;
 	}
 
 	$('#zoomInButton').on('click', function () { zoomGlyph(1.05); }); // 放大 5%
@@ -1048,7 +1088,6 @@ $(document).ready(async function () {
 		tempCtx.fillStyle = 'white';
 		tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 		const img = new Image();
-		img.src = savedCanvas;
 		return new Promise((resolve) => {
 			img.onload = function () {
 				tempCtx.drawImage(img, 0, 0);
@@ -1065,6 +1104,7 @@ $(document).ready(async function () {
 					resolve(svgData);
 				});
 			};
+			img.src = savedCanvas;
 		});
 	}
 
@@ -1131,7 +1171,7 @@ $(document).ready(async function () {
 
 		const totalGlyphs = Object.keys(glyphMap).length; // 總字符數量
 		let processedGlyphs = 0;
-		var scale = parseInt(settings.scaleRate, 10) / 100;
+		var scale = 1 / (parseInt(settings.scaleRate, 10) / 100); // 反轉邏輯：數值越大字體中路徑越小
 		var scaleoff = (upm - scale * upm) / 2; // 縮放偏移量
 
 		for (let gname in glyphMap) {
@@ -1288,7 +1328,7 @@ $(document).ready(async function () {
 		$('#listup-body').empty(); 		// 清空
 
 		// 計算 viewBox
-		var scale = parseInt(settings.scaleRate, 10) / 100;
+		var scale = 1 / (parseInt(settings.scaleRate, 10) / 100); // 反轉邏輯
 		var emSize = Math.round(upm / scale);
 		var emOff = Math.round((upm - emSize) / 2);
 		var viewBox = `${emOff} ${emOff} ${emSize} ${emSize}`;
@@ -1461,8 +1501,9 @@ $(document).ready(async function () {
 	});
 	
 	// 打开预览对话框
-	$('#openPreviewButton').on('click', function() {
+	$('#openPreviewButton, #openPreviewButtonHeader').on('click', function() {
 		$('#preview-container').fadeIn(200);
+		renderPreview(); // 打开时自动更新预览
 	});
 	
 	// 关闭预览对话框
@@ -1475,6 +1516,7 @@ $(document).ready(async function () {
 		const size = $(this).val();
 		$('#previewFontSizeValue').text(size + 'px');
 		$('#previewOutput').css('font-size', size + 'px');
+		renderPreview(); // 自动更新预览
 	});
 	
 	// 预览行高滑块
@@ -1483,23 +1525,35 @@ $(document).ready(async function () {
 		$('#previewLineHeightValue').text(lineHeight + '%');
 		$('#previewOutput').css('line-height', lineHeight + '%');
 	});
+
+	// 预览字间距滑块
+	$('#previewLetterSpacingSlider').on('input', function() {
+		const spacing = $(this).val();
+		$('#previewLetterSpacingValue').text(spacing + 'px');
+		renderPreview(); // 自动更新预览
+	});
 	
-	// 预览按钮
-	$('#previewButton').on('click', async function() {
+	let previewRenderSeq = 0;
+
+	// 自动更新预览渲染函数
+	async function renderPreview() {
+		const seq = ++previewRenderSeq;
 		const text = $('#previewTextInput').val();
-		if (!text) {
-			alert(window.i18n.t('previewTextPlaceholder'));
-			return;
-		}
-		
 		const $output = $('#previewOutput');
 		$output.empty();
 
-		// 获取当前字号
+		if (!text) {
+			return;
+		}
+
+		// 获取当前字号与字间距
 		const fontSize = parseInt($('#previewFontSizeSlider').val(), 10);
+		const spacing = parseInt($('#previewLetterSpacingSlider').val(), 10);
 
 		// 逐字渲染
 		for (let char of text) {
+			if (seq !== previewRenderSeq) return; // 放弃旧渲染以防竞态条件
+
 			if (char === '\r') {
 				continue;
 			}
@@ -1520,13 +1574,16 @@ $(document).ready(async function () {
 				// 尝试从数据库加载该字的数据
 				const glyphData = await loadFromDB('g_' + glyphName);
 				
+				if (seq !== previewRenderSeq) return; // 数据库读取是异步的，再次检查竞态条件
+				
 				if (glyphData) {
-					// 创建字符的图片元素
+					// 创建字符 of 图片元素
 					const img = document.createElement('img');
 					img.style.width = fontSize + 'px';
 					img.style.height = 'auto';
 					img.style.display = 'inline-block';
 					img.style.verticalAlign = 'baseline';
+					img.style.marginRight = spacing + 'px';
 					img.alt = char;
 					img.src = glyphData;
 					$output.append(img);
@@ -1535,16 +1592,21 @@ $(document).ready(async function () {
 					const span = document.createElement('span');
 					span.textContent = char;
 					span.style.color = '#ccc';
+					span.style.marginRight = spacing + 'px';
 					$output.append(span);
 				}
 			} else {
 				// 如果不在 glyphMap 中,直接显示
 				const span = document.createElement('span');
 				span.textContent = char;
+				span.style.marginRight = spacing + 'px';
 				$output.append(span);
 			}
 		}
-	});
+	}
+
+	// 监听输入，实时自动渲染预览
+	$('#previewTextInput').on('input', renderPreview);
 	
 	// 清空预览
 	$('#previewClearButton').on('click', function() {
@@ -1581,11 +1643,20 @@ $(document).ready(async function () {
         }
     });
 
-    // 修改清除所有資料的功能
+    // 修改清除所有資料的功能 (僅清除字形資料，保留設定)
     $('#clearAllButton').on('click', async function () {
         if (confirm(fdrawer.clearConfirm)) {
-            await clearDB();
+            await clearFontData();
             alert(fdrawer.clearDone);
+            location.reload(); // 重新載入頁面
+        }
+    });
+
+    // 重置所有設定的功能
+    $('#resetSettingsButton').on('click', async function () {
+        if (confirm(window.i18n.t('resetSettingsConfirm'))) {
+            await resetSettingsDB();
+            alert(window.i18n.t('resetSettingsDone'));
             location.reload(); // 重新載入頁面
         }
     });

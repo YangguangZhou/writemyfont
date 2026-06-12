@@ -82,6 +82,7 @@ body {
     padding: env(safe-area-inset-top) 24px 0 24px;
     box-shadow: var(--shadow-sm);
     z-index: 20;
+    flex-shrink: 0;
 }
 
 .logo {
@@ -147,6 +148,7 @@ body {
     overflow: hidden;
     position: relative;
     padding: 0 16px;
+    min-height: 0;
 }
 
 .workspace {
@@ -157,6 +159,8 @@ body {
     gap: 40px;
     padding: 20px 0;
     position: relative;
+    min-height: 0;
+    overflow-y: auto;
 }
 
 /* Navigation Buttons */
@@ -202,21 +206,14 @@ body {
     height: fit-content;
     background: var(--card-bg);
     border: 1px solid var(--border-light);
-    box-shadow: var(--shadow-lg);
-    border-radius: var(--radius-xl);
+    border-radius: 0;
     padding: 0;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: visible;
-}
-
-.canvas-wrapper:hover {
-    box-shadow: var(--shadow-xl);
-    border-color: var(--border-hover);
 }
 
 #canvas-container {
     position: relative;
-    border-radius: var(--radius-xl);
+    border-radius: 0;
     overflow: hidden;
 }
 
@@ -328,6 +325,7 @@ canvas {
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
     height: auto;
+    flex-shrink: 0;
 }
 
 .list-selector {
@@ -380,6 +378,7 @@ canvas {
     box-shadow: var(--shadow-md);
     gap: 16px;
     height: auto;
+    flex-shrink: 0;
 }
 
 .drawing-tools, .action-tools {
@@ -587,6 +586,7 @@ canvas {
     justify-content: space-between;
     padding: 0 24px env(safe-area-inset-bottom) 24px;
     z-index: 10;
+    flex-shrink: 0;
 }
 
 #progress-container {

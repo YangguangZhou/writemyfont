@@ -29,19 +29,17 @@
 		// 更新设置页面
 		$('#span-welcome').html(t('spanWelcome'));
 		
-		// 使用更精确的选择器，只选择设置项的note，排除span-welcome
-		const $settingsH3 = $('#settings-container h3');
-		$settingsH3.eq(0).text(t('fontNameEngLabel'));
+		// 使用更精确的ID选择器，避免索引错乱
+		$('#fontNameEngLabel').text(t('fontNameEngLabel'));
 		$('#fontNameEng').attr('placeholder', t('fontNameEngPlaceholder'));
-		$settingsH3.eq(1).text(t('fontNameCJKLabel'));
+		$('#fontNameCJKLabel').text(t('fontNameCJKLabel'));
 		$('#fontNameCJK').attr('placeholder', t('fontNameCJKPlaceholder'));
-		$settingsH3.eq(2).text(t('scaleRateLabel'));
+		$('#scaleRateLabel').text(t('scaleRateLabel'));
 		
-		const $settingsNotes = $('#settings-container .note').not('#span-welcome');
-		$settingsNotes.eq(0).text(t('scaleRateNote'));
-		$settingsH3.eq(3).text(t('canvasSizeLabel'));
-		$settingsNotes.eq(1).text(t('canvasSizeNote'));
-		$settingsH3.eq(4).text(t('gridTypeLabel'));
+		$('#scaleRateNote').text(t('scaleRateNote'));
+		$('#canvasSizeLabel').text(t('canvasSizeLabel'));
+		$('#canvasSizeNote').text(t('canvasSizeNote'));
+		$('#gridTypeLabel').text(t('gridTypeLabel'));
 		
 		// 更新格线样式选项
 		const gridTypes = t('gridTypes');
@@ -54,11 +52,11 @@
 			});
 		}
 		
-		$settingsH3.eq(5).text(t('showBaselineLabel'));
-		$settingsNotes.eq(2).text(t('showBaselineNote'));
-		$settingsH3.eq(6).text(t('noFixedWidthLabel'));
-		$settingsNotes.eq(3).text(t('noFixedWidthNote'));
-		$settingsH3.eq(7).text(t('pressureEffectLabel'));
+		$('#showBaselineLabel').text(t('showBaselineLabel'));
+		$('#showBaselineNote').text(t('showBaselineNote'));
+		$('#noFixedWidthLabel').text(t('noFixedWidthLabel'));
+		$('#noFixedWidthNote').text(t('noFixedWidthNote'));
+		$('#pressureEffectLabel').text(t('pressureEffectLabel'));
 		
 		// 更新笔压选项
 		const pressureEffects = t('pressureEffects');
@@ -71,20 +69,22 @@
 			});
 		}
 		
-		$settingsNotes.eq(4).text(t('pressureEffectNote'));
+		$('#pressureEffectNote').text(t('pressureEffectNote'));
 		
 		// 觸控筆傾斜角
-		$settingsH3.eq(8).text(t('penAngleModeLabel'));
-		$settingsNotes.eq(5).text(t('penAngleModeNote'));
+		$('#penAngleModeLabel').text(t('penAngleModeLabel'));
+		$('#penAngleModeNote').text(t('penAngleModeNote'));
 		
 		// 舊版筆壓模式
-		$settingsH3.eq(9).text(t('pressureDrawingLabel'));
-		$settingsNotes.eq(6).text(t('pressureDrawingNote'));
+		$('#pressureDrawingLabel').text(t('pressureDrawingLabel'));
+		$('#pressureDrawingNote').text(t('pressureDrawingNote'));
 		
-		// 完全清除字型資料
-		$settingsH3.eq(10).text(t('clearAllLabel'));
+		// 完全清除字型資料與重置設定
+		$('#clearAllLabel').text(t('clearAllLabel'));
 		$('#clearAllButton').text(t('clearAllButton'));
-		$settingsH3.eq(11).text(t('exportEventsLabel'));
+		$('#resetSettingsLabel').text(t('resetSettingsLabel'));
+		$('#resetSettingsButton').text(t('resetSettingsButton'));
+		$('#exportEventsLabel').text(t('exportEventsLabel'));
 		$('#exportEventsButton').text(t('exportEventsButton'));
 
 		// 更新匯入字表與預覽區塊
@@ -94,13 +94,14 @@
 		$('#importTextNote').text(t('importTextNote'));
 		$('#previewFontTitle').text(t('previewFont'));
 		$('#openPreviewButton').text(t('openPreviewButton'));
+		$('#openPreviewButtonHeader').attr('title', t('previewFont'));
 		$('#preview-title').text(t('previewFont'));
 		$('#previewTextLabel').text(t('previewTextLabel') + '：');
 		$('#previewTextInput').attr('placeholder', t('previewTextPlaceholder'));
 		$('#previewNote').text(t('previewNote'));
 		$('#previewFontSizeLabel').text(t('previewFontSize') + '：');
 		$('#previewLineHeightLabel').text(t('previewLineHeight') + '：');
-		$('#previewButton').text(t('previewButton'));
+		$('#previewLetterSpacingLabel').text(t('previewLetterSpacing') + '：');
 		$('#previewClearButton').text(t('previewClear'));
 		
 		// 更新下载按键多语言
