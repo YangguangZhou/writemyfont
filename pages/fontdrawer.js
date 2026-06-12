@@ -779,6 +779,7 @@ $(document).ready(async function () {
 
     // 開始繪製
 	$canvas.on('mousedown touchstart pointerdown', function (event) {
+		ratio = canvas.height / $canvas.height(); // 確保縮放比例是最新的
 		if (event.touches && event.touches.length === 2) {
 			if (isDrawing) $('#undoButton').trigger('click');		// 先撤銷掉目前的筆劃
 			isDrawing = false;
@@ -846,7 +847,8 @@ $(document).ready(async function () {
 
 			var lw = settings.lineWidth * pressureVal * 2;
 
-			var d = Math.max(Math.abs(lastX - x), Math.abs(lastY - y)) * 1.5;
+			// 計算歐氏距離並提高密度，避免邊緣出現像素顆粒與鋸齒
+			var d = Math.sqrt(Math.pow(lastX - x, 2) + Math.pow(lastY - y, 2)) * 3;
 			if (d > 40) events.push(`Long-DrawImage / ${pressureVal} / ${event.originalEvent.pointerType} / ${x}, ${y}, ${lw} (${lastX}, ${lastY}, ${lastLW}) ${d}`); // 儲存事件資訊
 			if (d > 0) {
 				for (var t = d; t>0; t--) {
@@ -959,6 +961,27 @@ $(document).ready(async function () {
 	$('#moveRightButton').on('click', function () { moveGlyph(10, 0); }); // 向右移動 10px
 	$('#moveUpButton').on('click', function () { moveGlyph(0, -10); }); // 向上移動 10px
 	$('#moveDownButton').on('click', function () { moveGlyph(0, 10); }); // 向下移動 10px
+
+	async function zoomGlyph(scaleRatio) {
+		const savedCanvas = await loadFromDB('g_' + nowGlyph);
+		if (!savedCanvas) return; // 如果沒有儲存的畫布，則不進行任何操作
+		undoStack.push(canvas.toDataURL()); // 儲存當前畫布狀態到 undoStack
+
+		const img = new Image();
+		img.src = savedCanvas;
+		img.onload = function () {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			const newWidth = canvas.width * scaleRatio;
+			const newHeight = canvas.height * scaleRatio;
+			const dx = (canvas.width - newWidth) / 2;
+			const dy = (canvas.height - newHeight) / 2;
+			ctx.drawImage(img, dx, dy, newWidth, newHeight);
+			saveToLocalDB(); // 更新 Local Storage
+		};
+	}
+
+	$('#zoomInButton').on('click', function () { zoomGlyph(1.05); }); // 放大 5%
+	$('#zoomOutButton').on('click', function () { zoomGlyph(0.95); }); // 縮小 5%
 
 	// 支援鍵盤方向鍵操作
 	$(document).on('keydown', function (event) {

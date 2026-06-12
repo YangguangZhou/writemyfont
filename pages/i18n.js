@@ -2,7 +2,7 @@
 const i18n = {
 	// 简体中文
 	'zh-CN': {
-		title: '手写字体生成器 by 字嗨',
+		title: '手写字体生成器',
 		appTitle: '手写字体生成器',
 		downloadButtonText: '下载字体',
 		listLabel: '字表：',
@@ -80,7 +80,6 @@ const i18n = {
 		
 		// 提示内容
 		hintContent: [
-			'本工具由「<a href="https://zi-hi.com" target="_blank">字嗨！</a>」提供。',
 			'字表来源于「<a href="https://justfont.com/jf7000" target="_blank">jf7000常用字集</a>」。',
 			'所有数据存储在浏览器本地，建议定期使用导出功能备份，防止数据丢失。',
 			'建议每写完一个字就调整位置（汉字通常居中），这样比事后批量调整更方便。',
@@ -171,7 +170,7 @@ const i18n = {
 	
 	// 繁体中文
 	'zh-TW': {
-		title: '手寫字型產生器 by 字嗨',
+		title: '手寫字型產生器',
 		appTitle: '手寫字型產生器',
 		downloadButtonText: '下載字型',
 		listLabel: '字表：',
@@ -245,7 +244,6 @@ const i18n = {
 		exportDataButton: '備份工作中的字型資料',
 		
 		hintContent: [
-			'本工具由「<a href="https://zi-hi.com" target="_blank">字嗨！</a>」提供。',
 			'書寫的字表來自「<a href="https://justfont.com/jf7000" target="_blank">jf7000當務字集</a>」。',
 			'由於所有資料儲存在您瀏覽器本地端，若擔心被瀏覽器清除，建議定期用匯出功能備份資料。',
 			'建議每個字寫好後，就立刻調整位置（漢字原則上置中），這樣可避免事後調整困難。',
@@ -335,7 +333,7 @@ const i18n = {
 	
 	// 日语
 	'ja': {
-		title: 'フォントを書こう！ by 字嗨',
+		title: 'フォントを書こう！',
 		appTitle: 'フォントを書こう！',
 		downloadButtonText: 'ダウンロード',
 		listLabel: '範囲：',

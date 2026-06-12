@@ -1,0 +1,22 @@
+{
+  "name": "手寫字型產生器",
+  "short_name": "手寫字型產生器",
+  "description": "方便的手寫字型生成工具，可以自訂字表並在線上書寫、匯出字型檔。",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

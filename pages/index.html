@@ -2,8 +2,17 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>手寫字型產生器 by 字嗨</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>手寫字型產生器</title>
+    <!-- PWA Settings -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="手寫字型">
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4f46e5">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -14,8 +23,8 @@
 <body lang="zh-TW">
     <header class="app-header">
         <div class="logo">
+            <img src="logo.png" alt="" width="40" height="40">
             <h1>手寫字型產生器</h1>
-            <span class="subtitle">by 字嗨</span>
         </div>
         <div class="header-controls">
             <button id="langButton" class="icon-btn" title="語言/Language"><i class="fas fa-globe"></i></button>
@@ -88,6 +97,8 @@
                     <button id="moveUpButton" class="tool-btn mini"><i class="fas fa-arrow-up"></i></button>
                     <button id="moveDownButton" class="tool-btn mini"><i class="fas fa-arrow-down"></i></button>
                     <button id="moveRightButton" class="tool-btn mini"><i class="fas fa-arrow-right"></i></button>
+                    <button id="zoomInButton" class="tool-btn mini"><i class="fas fa-search-plus"></i></button>
+                    <button id="zoomOutButton" class="tool-btn mini"><i class="fas fa-search-minus"></i></button>
                 </div>
             </div>
         </div>
@@ -135,7 +146,6 @@
                 <span id="closeHintButton" class="close-btn"><i class="fas fa-times"></i></span>
                 <h2>提示 Ver <span id="version"></span></h2>
                 <ul id="hintContent">
-                    <li>本工具由「<a href="https://zi-hi.com" target="_blank">字嗨！</a>」提供。</li>
                     <li>書寫的字表來自「<a href="https://justfont.com/jf7000" target="_blank">jf7000當務字集</a>」。</li>
                     <li>由於所有資料儲存在您瀏覽器本地端，若擔心被瀏覽器清除，建議定期用匯出功能備份資料。</li>
                     <li>建議每個字寫好後，就立刻調整位置（漢字原則上置中），這樣可避免事後調整困難。</li>
@@ -364,6 +374,16 @@
 			};
 			document.body.appendChild(script);
 		})();
+	</script>
+	<script>
+		// Register Service Worker for PWA
+		if ('serviceWorker' in navigator) {
+			window.addEventListener('load', () => {
+				navigator.serviceWorker.register('sw.js')
+					.then(reg => console.log('Service Worker registered successfully', reg))
+					.catch(err => console.error('Service Worker registration failed', err));
+			});
+		}
 	</script>
 </body>
 </html>

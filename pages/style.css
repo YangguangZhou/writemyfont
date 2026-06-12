@@ -37,11 +37,16 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+html {
+    height: 100%;
+}
+
 body {
     font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-primary);
     height: 100vh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -68,21 +73,29 @@ body {
    Header Component
    ========================================================================== */
 .app-header {
-    height: var(--header-height);
+    height: calc(var(--header-height) + env(safe-area-inset-top));
     background-color: var(--card-bg);
     border-bottom: 1px solid var(--border-light);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 24px;
+    padding: env(safe-area-inset-top) 24px 0 24px;
     box-shadow: var(--shadow-sm);
     z-index: 20;
 }
 
 .logo {
     display: flex;
-    align-items: baseline;
-    gap: 6px;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.logo img {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 auto;
+    object-fit: contain;
 }
 
 .logo h1 {
@@ -90,12 +103,7 @@ body {
     font-weight: 700;
     color: var(--text-primary);
     letter-spacing: -0.02em;
-}
-
-.logo .subtitle {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    font-weight: 500;
+    white-space: nowrap;
 }
 
 .header-controls {
@@ -571,13 +579,13 @@ canvas {
    Footer Component & Progress
    ========================================================================== */
 .app-footer {
-    height: var(--footer-height);
+    height: calc(var(--footer-height) + env(safe-area-inset-bottom));
     background: var(--card-bg);
     border-top: 1px solid var(--border-light);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 24px;
+    padding: 0 24px env(safe-area-inset-bottom) 24px;
     z-index: 10;
 }
 
@@ -1095,7 +1103,7 @@ canvas {
     }
     
     .app-footer {
-        padding: 0 16px;
+        padding: 0 16px env(safe-area-inset-bottom) 16px;
         gap: 10px;
     }
     
@@ -1118,6 +1126,42 @@ canvas {
     .logo h1 {
         font-size: 1.1rem;
     }
+
+    .logo {
+        gap: 7px;
+    }
+
+    .logo img {
+        width: 34px;
+        height: 34px;
+    }
+
+    .drawing-tools {
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .slider-group {
+        flex: 1 1 auto;
+        min-width: 0;
+        gap: 6px;
+    }
+
+    .slider-group input[type="range"] {
+        flex: 1 1 auto;
+        width: auto;
+        min-width: 0;
+    }
+
+    .slider-group label,
+    #lineWidthValue {
+        flex: 0 0 auto;
+    }
+
+    #lineWidthValue {
+        min-width: 18px;
+        text-align: right;
+    }
     
     .dialog-content {
         max-height: 90vh;
@@ -1126,6 +1170,48 @@ canvas {
     
     .dialog-body {
         padding: 20px;
+    }
+}
+
+/* Short height viewport optimizations */
+@media (max-height: 800px) {
+    .workspace {
+        padding: 10px 0;
+        gap: 20px;
+    }
+    #charSeq {
+        width: 60px;
+        height: 60px;
+        font-size: 2.8rem;
+    }
+    .canvas-area {
+        gap: 8px;
+    }
+    .bottom-toolbar {
+        margin-bottom: 8px;
+        padding: 8px 16px;
+    }
+}
+
+@media (max-height: 700px) {
+    :root {
+        --header-height: 50px;
+        --footer-height: 60px;
+    }
+    .workspace {
+        padding: 5px 0;
+        gap: 10px;
+    }
+    #charSeq {
+        width: 48px;
+        height: 48px;
+        font-size: 2.2rem;
+    }
+    .app-header {
+        height: calc(50px + env(safe-area-inset-top));
+    }
+    .app-footer {
+        height: calc(60px + env(safe-area-inset-bottom));
     }
 }
 
