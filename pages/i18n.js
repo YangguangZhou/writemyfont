@@ -3,6 +3,8 @@ const i18n = {
 	// 简体中文
 	'zh-CN': {
 		title: '手写字体生成器 by 字嗨',
+		appTitle: '手写字体生成器',
+		downloadButtonText: '下载字体',
 		listLabel: '字表：',
 		charSeqLabel: '字符列表',
 		charUnit: '字',
@@ -57,6 +59,8 @@ const i18n = {
 			'enhancex': '再增强（更省力）'
 		},
 		pressureEffectNote: '仅对支持压感的设备有效。此功能仍在调整中，未来版本可能不兼容。',
+		penAngleModeLabel: '启用触控笔倾斜角',
+		penAngleModeNote: '此选项仅对支持倾斜角的设备有效。',
 		pressureDrawingLabel: '使用旧版笔压模式（不推荐）',
 		pressureDrawingNote: '旧版笔压模式不支持笔刷功能。',
 		clearAllLabel: '清空所有字体数据',
@@ -168,6 +172,8 @@ const i18n = {
 	// 繁体中文
 	'zh-TW': {
 		title: '手寫字型產生器 by 字嗨',
+		appTitle: '手寫字型產生器',
+		downloadButtonText: '下載字型',
 		listLabel: '字表：',
 		charSeqLabel: '字符列表',
 		charUnit: '字',
@@ -220,6 +226,8 @@ const i18n = {
 			'enhancex': '再增強（更省力）'
 		},
 		pressureEffectNote: '本選項僅對有筆壓的設備有效。目前尚在調整中，未來修改可能無法維持舊版相容性。',
+		penAngleModeLabel: '啟用觸控筆傾斜角',
+		penAngleModeNote: '本選項僅對有傾斜角的設備有效。',
 		pressureDrawingLabel: '啟用舊筆壓模式（不建議）',
 		pressureDrawingNote: '舊筆壓模式無法支援筆刷功能。',
 		clearAllLabel: '完全清除字型資料',
@@ -328,6 +336,8 @@ const i18n = {
 	// 日语
 	'ja': {
 		title: 'フォントを書こう！ by 字嗨',
+		appTitle: 'フォントを書こう！',
+		downloadButtonText: 'ダウンロード',
 		listLabel: '範囲：',
 		charSeqLabel: 'グリフ一覧',
 		charUnit: '字',
@@ -380,6 +390,8 @@ const i18n = {
 			'enhancex': '再増幅（もっと省力化）'
 		},
 		pressureEffectNote: 'このオプションは筆圧対応デバイスでのみ有効です。現在調整中であり、将来的な変更により旧バージョンとの互換性が維持されない可能性があります。',
+		penAngleModeLabel: 'スタイラスペンの傾き検知を有効にする',
+		penAngleModeNote: 'このオプションは傾き検知に対応したデバイスのみ有効です。',
 		pressureDrawingLabel: '旧筆圧モードの有効化（非推奨）',
 		pressureDrawingNote: '旧筆圧モードはブラシに対応しません。',
 		clearAllLabel: 'フォントデータを削除する',
@@ -534,12 +546,74 @@ function getGlyphListName(listKey) {
 	return listKey;
 }
 
+// 翻译字符分类名称/注释
+function translateGlyphNote(n) {
+	if (!n) return '';
+	const lang = getCurrentLanguage();
+	if (lang === 'zh-TW') return n;
+	
+	if (lang === 'zh-CN') {
+		let res = n;
+		res = res.replace(/寫/g, '写')
+		         .replace(/形/g, '角')
+		         .replace(/號/g, '号')
+		         .replace(/數/g, '数')
+		         .replace(/體/g, '体')
+		         .replace(/線/g, '线')
+		         .replace(/雙/g, '双')
+		         .replace(/錢/g, '钱')
+		         .replace(/減/g, '减')
+		         .replace(/點/g, '点')
+		         .replace(/橫/g, '横')
+		         .replace(/直/g, '竖')
+		         .replace(/簡/g, '简')
+		         .replace(/粵/g, '粤')
+		         .replace(/擴/g, '扩')
+		         .replace(/補/g, '补')
+		         .replace(/漢字/g, '汉字')
+		         .replace(/符號/g, '符号')
+		         .replace(/驚嘆/g, '感叹');
+		return res;
+	}
+	
+	if (lang === 'ja') {
+		const jaMap = {
+			'小寫字母': '小文字',
+			'大寫字母': '大文字',
+			'數字': '数字',
+			'平假名': 'ひらがな',
+			'片假名': 'カタカナ',
+			'注音符號': '注音符号',
+			'心經': '般若心経'
+		};
+		if (jaMap[n]) return jaMap[n];
+		
+		let res = n;
+		res = res.replace(/半形/g, '半角')
+		         .replace(/全形/g, '全角')
+		         .replace(/字母/g, 'アルファベット')
+		         .replace(/驚嘆號/g, '感嘆符')
+		         .replace(/問號/g, '疑問符')
+		         .replace(/括引號/g, '括弧')
+		         .replace(/括號/g, '括弧')
+		         .replace(/引號/g, '引用符')
+		         .replace(/逗號/g, '読点')
+		         .replace(/句點/g, '句点')
+		         .replace(/頓號/g, '読点')
+		         .replace(/斜線/g, 'スラッシュ')
+		         .replace(/直排相容/g, '縦書き用');
+		return res;
+	}
+	return n;
+}
+
 // 导出供全局使用
 window.i18n = {
 	t: t,
 	getCurrentLanguage: getCurrentLanguage,
 	setLanguage: setLanguage,
 	getGlyphListName: getGlyphListName,
+	translateGlyphNote: translateGlyphNote,
 	languages: {
 		'zh-CN': '简体中文',
 		'zh-TW': '繁體中文',

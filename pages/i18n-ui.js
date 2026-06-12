@@ -17,7 +17,8 @@
 		document.title = t('title');
 		
 		// 更新主界面
-		$('#list-container label[for="listSelect"]').text(t('listLabel'));
+		$('.logo h1').text(t('appTitle'));
+		$('.list-selector label').html('<i class="fas fa-list"></i> ' + t('listLabel'));
 		
 		// 更新对话框标题
 		$('#listup-container h2').text(t('charSeqLabel'));
@@ -71,11 +72,19 @@
 		}
 		
 		$settingsNotes.eq(4).text(t('pressureEffectNote'));
-		$settingsH3.eq(8).text(t('pressureDrawingLabel'));
-		$settingsNotes.eq(5).text(t('pressureDrawingNote'));
-		$settingsH3.eq(9).text(t('clearAllLabel'));
+		
+		// 觸控筆傾斜角
+		$settingsH3.eq(8).text(t('penAngleModeLabel'));
+		$settingsNotes.eq(5).text(t('penAngleModeNote'));
+		
+		// 舊版筆壓模式
+		$settingsH3.eq(9).text(t('pressureDrawingLabel'));
+		$settingsNotes.eq(6).text(t('pressureDrawingNote'));
+		
+		// 完全清除字型資料
+		$settingsH3.eq(10).text(t('clearAllLabel'));
 		$('#clearAllButton').text(t('clearAllButton'));
-		$settingsH3.eq(10).text(t('exportEventsLabel'));
+		$settingsH3.eq(11).text(t('exportEventsLabel'));
 		$('#exportEventsButton').text(t('exportEventsButton'));
 
 		// 更新匯入字表與預覽區塊
@@ -93,6 +102,9 @@
 		$('#previewLineHeightLabel').text(t('previewLineHeight') + '：');
 		$('#previewButton').text(t('previewButton'));
 		$('#previewClearButton').text(t('previewClear'));
+		
+		// 更新下载按键多语言
+		$('#downloadButton').html('<i class="fas fa-save"></i> ' + t('downloadButtonText'));
 		
 		// 更新下载页面
 		const $downloadH3 = $('#download-container h3');

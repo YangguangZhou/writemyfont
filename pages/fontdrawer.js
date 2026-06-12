@@ -1,4 +1,4 @@
-const version = '0.595'; // 版本號
+const version = '0.596'; // 版本號
 const upm = 1000;
 const userAgent = navigator.userAgent.toLowerCase();
 const pressureDelta = 1.3;		// 筆壓模式跟一般模式的筆寬差異倍數 (舊筆壓模式用)
@@ -8,6 +8,9 @@ const events = [];
 
 let db;
 let settings = null;
+let nowList = null;
+let nowGlyphIndex = null;
+let nowGlyph = null;
 
 const brushes = [];
 
@@ -126,6 +129,42 @@ function countGlyphFromDB() {
 	});
 }
 
+function getSavedGlyphsFromDB() {
+	return new Promise((resolve, reject) => {
+		const transaction = db.transaction([storeName], 'readonly');
+		const store = transaction.objectStore(storeName);
+		const request = store.getAllKeys();
+		request.onsuccess = function (event) {
+			const keys = event.target.result.filter(key => key.startsWith('g_')).map(key => key.substring(2));
+			resolve(new Set(keys));
+		};
+		request.onerror = function (event) {
+			reject(event.target.error);
+		};
+	});
+}
+
+async function updateProgressUI() {
+    if (!nowList) return;
+    try {
+        const savedKeys = await getSavedGlyphsFromDB();
+        let currentCount = 0;
+        for (let i = 0; i < nowList.length; i++) {
+            if (savedKeys.has(nowList[i])) {
+                currentCount++;
+            }
+        }
+        const total = nowList.length;
+        $('#spanDoneCount').text(`${currentCount} / ${total}`);
+        
+        const percentage = total > 0 ? Math.round((currentCount / total) * 100) : 0;
+        $('#progress-bar').val(percentage);
+        $('#progress-text').text(`${percentage}%`);
+    } catch (e) {
+        console.error("Failed to update progress UI", e);
+    }
+}
+
 // 刪除 IndexedDB 中的資料
 function deleteFromDB(key) {
 	return new Promise((resolve, reject) => {
@@ -170,6 +209,7 @@ async function loadSettings() {
 		brushType: await loadFromDB('brushType', 0) * 1, 					// 筆刷類型，預設為 0
 		pressureMode: await loadFromDB('pressureMode', 'N') == 'Y',			// 筆壓模式，預設為 N
 		pressureEffect: await loadFromDB('pressureEffect', 'none'),			// 筆壓公式，預設為 none
+		penAngleMode: await loadFromDB('penAngleMode', 'N') == 'Y',			// 筆傾斜模式，預設為 N
 		gridType: await loadFromDB('gridType', '3x3grid'),					// 格線類型，預設為 3x3grid
 		oldPressureMode: await loadFromDB('oldPressureMode', 'N') == 'Y',	// 啟用舊版筆壓模式，預設為 N
 		showBaseline: await loadFromDB('showBaseline', 'Y') == 'Y',			// 是否顯示基線，預設為 Y
@@ -432,7 +472,7 @@ $(document).ready(async function () {
 		} else {
 			if ($('#ads-container')) $('#ads-container').show();
 		}
-		$('#spanDoneCount').text(await countGlyphFromDB());
+		await updateProgressUI();
 
     }).catch((error) => {
         console.error('IndexedDB 起動失敗', error);
@@ -457,17 +497,18 @@ $(document).ready(async function () {
 		$('#pressureButton').toggle(!settings.oldPressureMode); 	// 如果舊筆壓繪圖啟用，則隱藏筆壓開關
 	}
 
-	let nowList = null;
-	let nowGlyphIndex = null;
-	let nowGlyph = null;
+	nowList = null;
+	nowGlyphIndex = null;
+	nowGlyph = null;
 
 	// 切換列表
-	$listSelect.on('change', function () {
+	$listSelect.on('change', async function () {
 		const selectedValue = $(this).val();
 		if (selectedValue) {
 			nowList = glyphList[selectedValue];
 			nowGlyphIndex = 0; // 重置當前字形索引
 			setGlyph(0);
+			await updateProgressUI();
 		}
 	});	//.change(); // 觸發一次 change 事件以載入第一個列表
 
@@ -483,7 +524,7 @@ $(document).ready(async function () {
 		$('#charSeq').text(glyphMap[nowGlyph].c).removeClass('vert');
 		if (glyphMap[nowGlyph].v && nowGlyph.indexOf('.vert') > 0) $('#charSeq').addClass('vert');
 
-		$('#glyphNote').text(glyphMap[nowGlyph].n || '');
+		$('#glyphNote').text(window.i18n.translateGlyphNote(glyphMap[nowGlyph].n) || '');
 
 		// 載入之前的畫布內容
 		undoStack.length = 0; // 清空復原堆疊
@@ -508,7 +549,7 @@ $(document).ready(async function () {
 			await deleteFromDB('s_' + glyph);
 		}
 
-		$('#spanDoneCount').text(await countGlyphFromDB());
+		await updateProgressUI();
 	}
 
 	// 儲存畫布的功能
@@ -684,12 +725,28 @@ $(document).ready(async function () {
 		}
 	}
 
+	let lastAngle = 0;
+	function getPenAngleValue(event) {
+		if (!settings.penAngleMode) return 0;
+		// 如果不是觸控筆，都回傳lastAngle
+		if (event.originalEvent.pointerType != 'pen') return lastAngle;
+		// 如果沒有傾斜資料，也回傳lastAngle
+		if (event.originalEvent.tiltX == 0 && event.originalEvent.tiltY == 0) return lastAngle;
+
+		let angle = Math.atan2(event.originalEvent.tiltY, event.originalEvent.tiltX); // * 180 / Math.PI; // 使用傾斜角
+		if (isNaN(angle)) return lastAngle;
+		angle -= 0.7
+		lastAngle = angle;
+		//console.log(angle, event.type, event.originalEvent.tiltX, event.originalEvent.tiltY);
+		return angle;
+	}
+
     // 儲存背景用於筆壓繪圖的即時預覽
     let backgroundImageData = null;
 	let lastX, lastY, lastLW, isMoved = false;
 	var eraseMode = false;
 
-	function drawBrush(ctx, brush, x, y, lw) {
+	function drawBrush(ctx, brush, x, y, lw, angle) {
 		if (userAgent.includes('macintosh') && userAgent.includes('safari') && !userAgent.includes('chrome')) {
 			// 在 Mac Safari 上使用臨時 canvas 繪製，避免直接繪圖造成污垢
 			// 不知道為什麼我的Mac-Safari直接繪圖會很髒，只好建立一個臨時的畫筆 canvas
@@ -698,12 +755,25 @@ $(document).ready(async function () {
 			brushCanvas.width = lw;
 			brushCanvas.height = lw;
 			const brushCtx = brushCanvas.getContext('2d');
+			
+			if (typeof(angle) == 'undefined') angle = 0;
+			brushCtx.save();
+			brushCtx.translate(lw/2, lw/2);
+			brushCtx.rotate(angle);
+			brushCtx.translate(-lw/2, -lw/2);
 			brushCtx.drawImage(brush, 0, 0, lw, lw);
+			brushCtx.restore();
 	
 			ctx.drawImage(brushCanvas, x - lw/2, y - lw/2);
 		} else {
 			// 其他瀏覽器直接繪製
+			if (typeof(angle) == 'undefined') angle = 0;
+			ctx.save();
+			ctx.translate(x, y);
+			ctx.rotate(angle);
+			ctx.translate(-x, -y);
 			ctx.drawImage(brush, x - lw/2, y - lw/2, lw+1, lw+1);
+			ctx.restore();
 		}
 	}
 
@@ -753,6 +823,7 @@ $(document).ready(async function () {
 	    const { x, y } = getCanvasCoordinates(event);
 		var pressureVal = getPressureValue('move', event, x, y);
 		if (settings.pressureMode && pressureVal == null) return;		// 筆壓模式必須要有筆壓值
+		var angleVal = getPenAngleValue(event);
 
         if (settings.oldPressureMode) {							// 舊筆壓模式
             // 使用筆壓繪圖系統：收集點並提供即時預覽
@@ -783,13 +854,13 @@ $(document).ready(async function () {
 					var ty = (lastY + (y - lastY) * t / d) * ratio;
 					var tlw = lastLW + (lw - lastLW) * t / d; // 線寬漸變
 
-					drawBrush(ctx, brushes[settings.brushType], tx, ty, tlw);	
+					drawBrush(ctx, brushes[settings.brushType], tx, ty, tlw, angleVal);	
 				}		
 				events.push(`Move-DrawImage / ${pressureVal} / ${event.originalEvent.pointerType} / ${x}, ${y}, ${lw} (${lastX}, ${lastY}, ${lastLW}) ${d}`); // 儲存事件資訊
 			}
 
 			lastX = x; // 更新最後的 X 座標
-			lastY = y; // 更新最後的 Y 座標
+			lastY = y; // 更新最後 the Y 座標
 			lastLW = lw; // 更新最後的筆寬
 			isMoved = true;
         }
@@ -816,7 +887,7 @@ $(document).ready(async function () {
         } else {
 			if (!isMoved) {
 				ctx.globalCompositeOperation = eraseMode ? "destination-out" : "source-over"; // 如果是橡皮擦模式，則使用 destination-out，否則使用 source-over
-				drawBrush(ctx, brushes[settings.brushType], lastX*ratio, lastY*ratio, lastLW);
+				drawBrush(ctx, brushes[settings.brushType], lastX*ratio, lastY*ratio, lastLW, lastAngle);
 			}
 
 			lastX = null;
@@ -867,6 +938,7 @@ $(document).ready(async function () {
 		//undoStack.length = 0; // 清空復原堆疊
 		await deleteFromDB('g_' + nowGlyph); // 清除 IndexedDB 中的資料
 		await deleteFromDB('s_' + nowGlyph); // 清除 IndexedDB 中的資料
+		await updateProgressUI();
 	});
 
 	async function moveGlyph(xoff, yoff) {
@@ -1129,6 +1201,7 @@ $(document).ready(async function () {
 		$('#canvasSizeValue').text(canvasSize + 'px');
 
 		$('#pressureEffectSelect').val(settings.pressureEffect);
+		$('#penAngleMode').prop('checked', settings.penAngleMode);
 		$('#pressureDrawingEnabled').prop('checked', settings.oldPressureMode);
 		$('#showBaselineCheck').prop('checked', settings.showBaseline);
 		$('#gridTypeSelect').val(settings.gridType);
@@ -1162,6 +1235,7 @@ $(document).ready(async function () {
 	});
 	
 	$('#pressureEffectSelect').change(function () { updateSetting('pressureEffect', $(this).val()); });
+	$('#penAngleMode').on('click', function () { updateSetting('penAngleMode', $(this).prop('checked')); });
 	$('#gridTypeSelect').change(function () { 
 		updateSetting('gridType', $(this).val());
 		initCanvas(canvas);
