@@ -637,7 +637,7 @@ $(document).ready(async function () {
 			const img = new Image();
 			img.onload = function () {
 				ctx.clearRect(0, 0, canvas.width, canvas.height);
-				ctx.drawImage(img, 0, 0);
+				ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 			};
 			img.src = savedCanvas;
 		}
@@ -720,11 +720,13 @@ $(document).ready(async function () {
 		$('#penButton').addClass('active');
 		$('#eraserButton').removeClass('active');
 		eraseMode = false;
+		userSelectedTool = 'pen';
 	});
 	$('#eraserButton').on('click', function () {	
 		$('#eraserButton').addClass('active');
 		$('#penButton').removeClass('active');
 		eraseMode = true; // 切換到橡皮擦模式
+		userSelectedTool = 'eraser';
 	});
 
 	let hasPointerEvent = false;	// 這個筆畫是否有pointer事件
@@ -806,6 +808,7 @@ $(document).ready(async function () {
     let backgroundImageData = null;
 	let lastX, lastY, lastLW, isMoved = false;
 	var eraseMode = false;
+	var userSelectedTool = 'pen';
 
 	function drawBrush(ctx, brush, x, y, lw, angle) {
 		if (typeof(angle) == 'undefined') angle = 0;
@@ -824,6 +827,32 @@ $(document).ready(async function () {
 			if (isDrawing) $('#undoButton').trigger('click');		// 先撤銷掉目前的筆劃
 			isDrawing = false;
 			return;
+		}
+
+		// 根據指標類型自動切換筆刷/橡皮擦並更新UI框的狀態
+		let pointerType = event.originalEvent && event.originalEvent.pointerType;
+		if (pointerType) {
+			if (pointerType === 'eraser') {
+				if (!eraseMode) {
+					$('#eraserButton').addClass('active');
+					$('#penButton').removeClass('active');
+					eraseMode = true;
+				}
+			} else {
+				if (userSelectedTool === 'pen') {
+					if (eraseMode) {
+						$('#penButton').addClass('active');
+						$('#eraserButton').removeClass('active');
+						eraseMode = false;
+					}
+				} else {
+					if (!eraseMode) {
+						$('#eraserButton').addClass('active');
+						$('#penButton').removeClass('active');
+						eraseMode = true;
+					}
+				}
+			}
 		}
 
 		if (isDrawing && !event.type.includes('pointer')) return;
@@ -861,6 +890,33 @@ $(document).ready(async function () {
     // 繪製中
 	$canvas.on('mousemove touchmove pointermove', function (event) {
 		if (!isDrawing) return;
+
+		// 根據指標類型自動切換筆刷/橡皮擦並更新UI框的狀態
+		let pointerType = event.originalEvent && event.originalEvent.pointerType;
+		if (pointerType) {
+			if (pointerType === 'eraser') {
+				if (!eraseMode) {
+					$('#eraserButton').addClass('active');
+					$('#penButton').removeClass('active');
+					eraseMode = true;
+				}
+			} else {
+				if (userSelectedTool === 'pen') {
+					if (eraseMode) {
+						$('#penButton').addClass('active');
+						$('#eraserButton').removeClass('active');
+						eraseMode = false;
+					}
+				} else {
+					if (!eraseMode) {
+						$('#eraserButton').addClass('active');
+						$('#penButton').removeClass('active');
+						eraseMode = true;
+					}
+				}
+			}
+		}
+
 	    const { x, y } = getCanvasCoordinates(event);
 		var pressureVal = getPressureValue('move', event, x, y);
 		if (settings.pressureMode && pressureVal == null) return;		// 筆壓模式必須要有筆壓值
@@ -950,7 +1006,7 @@ $(document).ready(async function () {
             const img = new Image();
             img.onload = function () {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                 saveToLocalDB(); // 復原後更新 Local Storage
             };
             img.src = lastState;
@@ -991,7 +1047,8 @@ $(document).ready(async function () {
 		const img = new Image();
 		img.onload = function () {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			ctx.drawImage(img, xoff, yoff);
+			const scale = canvas.width / 500;
+			ctx.drawImage(img, xoff * scale, yoff * scale, canvas.width, canvas.height);
 			saveToLocalDB(); // 更新 Local Storage
 		};
 		img.src = savedCanvas;
@@ -1090,7 +1147,7 @@ $(document).ready(async function () {
 		const img = new Image();
 		return new Promise((resolve) => {
 			img.onload = function () {
-				tempCtx.drawImage(img, 0, 0);
+				tempCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
 
 				// 使用 potrace.js 將臨時 canvas 轉換為 SVG
 				Potrace.loadImageFromUrl(tempCanvas.toDataURL('image/png'));
@@ -1678,12 +1735,14 @@ document.addEventListener('DOMContentLoaded', function () {
         alert(fdrawer.inAppNotice);
     }
 
-	// 解決 iOS Safari 按鈕點兩下容易不小心放大視窗的問題
-    if (/iphone|ipad|ipod/.test(userAgent.toLowerCase()) && /safari/.test(userAgent.toLowerCase())) {
-        document.querySelectorAll('body').forEach(function(btn) {
-            btn.addEventListener('dblclick', function(e) {
-                e.preventDefault();
-            }, { passive: false });
-        });
-    }
+	// 解決 iOS Safari 放大/縮放視窗的問題
+	document.addEventListener('gesturestart', function(e) {
+		e.preventDefault();
+	}, { passive: false });
+	document.addEventListener('gesturechange', function(e) {
+		e.preventDefault();
+	}, { passive: false });
+	document.addEventListener('gestureend', function(e) {
+		e.preventDefault();
+	}, { passive: false });
 });

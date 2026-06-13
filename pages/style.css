@@ -39,6 +39,7 @@
 
 html {
     height: 100%;
+    touch-action: manipulation;
 }
 
 body {
@@ -51,6 +52,7 @@ body {
     flex-direction: column;
     overflow: hidden;
     letter-spacing: -0.01em;
+    touch-action: manipulation;
 }
 
 /* Custom Scrollbars */
